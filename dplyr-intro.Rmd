@@ -1,0 +1,54 @@
+---
+title: "dplyr-intro"
+author: "jspar"
+output: 
+  learnr::tutorial:
+      progressive: false
+      language:
+        en:
+          text:
+            startover: リセットする
+          button:
+            runcode: コードを実行
+            continue: 続ける
+            copyclipboard: クリップボードにコピー
+            startover: 最初から
+            previoustopic: 前のトピック
+            nexttopic: 次のトピック
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(tidyverse)
+library(magrittr)
+knitr::opts_chunk$set(error = TRUE)
+```
+
+## welcome
+This code computes the answer to one plus one,
+change it so it computes two plus two:
+
+```{r addition, exercise=TRUE}
+1 + 1
+```
+
+## shiny
+next is this 1
+
+```{r}
+sliderInput("bins", "Number of bins:", 
+            min = 1, max = 50, value = 30)
+plotOutput("distPlot")
+```
+
+```{r}
+#| context: server
+output$distPlot <- renderPlot({
+   x <- faithful[, 2]  # Old Faithful Geyser data
+   bins <- seq(min(x), max(x), length.out = input$bins + 1)
+   hist(x, breaks = bins, col = 'darkgray', border = 'white',
+        xlab = 'Waiting time to next eruption (in mins)',
+        main = 'Histogram of waiting times')
+})
+```
