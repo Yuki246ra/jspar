@@ -1,0 +1,48 @@
+---
+title: "jaspr-intro"
+author: "jspar"
+date: "`r Sys.Date()`"
+output: 
+  learnr::tutorial:
+      progressive: false
+      language:
+        en:
+          text:
+            startover: リセットする
+          button:
+            runcode: コードを実行
+            continue: 続ける
+            copyclipboard: クリップボードにコピー
+            startover: 最初から
+            previoustopic: 前のトピック
+            nexttopic: 次のトピック
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(magrittr)
+library(learnr)
+```
+
+# 趣旨
+研究データは普段Excelで扱ってるけども、コピペミスやら数式ミスやらで頭を抱えたことは無いでしょうか。
+
+また、Rというとっつきにくいけど便利なツールがあるらしいと聞いたけども、やっぱりとっつきにくくて使えていない方もいるかも知れません。
+
+そこでこのページでは、RとRのtidyverseパッケージの便利な関数を、実例とともに紹介します。
+
+研究の効率化を少しでもお助けできれば幸いです。
+
+## 想定する対象
+
+## 前準備
+
+```{r, eval=FALSE}
+library(tidyverse)
+```
+
+## pipe
+
+## help
+
