@@ -61,4 +61,5 @@ rsconnect/
 ## manual add
 old/
 renv/
+*.html
 
