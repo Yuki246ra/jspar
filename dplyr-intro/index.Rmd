@@ -62,6 +62,16 @@ data_p <- read_csv("data/data_phyis.csv", show_col_types = F)
 
 [データの書き出し](#データの書き出し)
 
+### このサイトの使い方
+このサイトでは、Rが皆さんのPCにインストールされていなくても、ブラウザ内でRのコマンドを実行し結果を見ることができます。  
+
+例えば下の1行目に `1 + `と入力しておいたので、`1 + 1`と数式を完成させてから、「▶コードを実行」を押してみてください。
+```{r inst, exercise=TRUE}
+1 +
+```
+次に、3行目に`Sys.time()`と入力して実行したらどうでしょう？  
+このようにいろいろとRのコードを試せますので、これから紹介するサンプルコードを自分なりに書き換えて実行してみてください。
+
 ### サンプルデータについて
 
 このチュートリアルでは、生理値を想定したdata_pと、質問紙データを想定したdata_qを使用しています。それぞれのcsvファイルは、こちらからダウンロードできます。
@@ -119,9 +129,9 @@ file.list <- list.files(pattern = ".csv", path = "data/", full.names = T)
 file.list
 ```
 
-#### リスト型で結果を得る
+#### `lapply()`を使って行う方法
 
-`lapply()`を使って行う方法
+結果は一つのリストに入ります。
 
 ```{r read_csv_list, exercise=TRUE, exercise.setup = "list_files"}
 result <- lapply(file.list, read_csv)
@@ -131,13 +141,14 @@ result[[1]]
 result[[2]]
 ```
 
-`for()`文を使う方法。ここでは、`assign()`関数を使って、別々の変数にデータを格納します。変数名はもともとのファイル名を使用した。
+`for()`文を使う方法。ここでは、`assign()`関数を使って、別々の変数にデータを格納します。変数名はもともとのファイル名を使用しました。
+データフレームを作って、その下に[結合](#データフレームの結合)することも可能です（メモリ効率が悪いが人間にはわかりやすい方法）。
 
 ```{r read_csv_for, exercise=TRUE, exercise.setup = "list_files"}
 
 for (i in 1:length(file.list)) {
   result <- read_csv(file.list[i])
-  assign(str_replace(file.list[i], ".csv", ""), result)
+  assign(str_replace_all(file.list[i], "data//|.csv", ""), result)  #linux vs windowsで/に対するエスケープの要否が異なる。
 }
 
 (data_p <- data_phyis)
@@ -420,8 +431,8 @@ data_p %>%
 ```{r pivot_longer2, exercise=TRUE}
 long_data <- data_p %>% 
   pivot_longer(cols = condition1:condition4, #計測値の入っている列範囲
-               names_to = "condition", 　　　#新しく作る条件用の列名
-               values_to = "value")　　　　　#値を入れる列名
+               names_to = "condition",       #新しく作る条件用の列名
+               values_to = "value")          #値を入れる列名
 long_data
 ```
 
@@ -433,7 +444,7 @@ long_data
 
 ```{r pivot_wider, exercise=TRUE, exercise.setup="pivot_longer2"}
 wide_data <- long_data %>% 
-  pivot_wider(id_cols = id:group,　　　#idや条件を示す列
+  pivot_wider(id_cols = id:group,      #idや条件を示す列
               names_from = condition,  #ワイドデータの列名のもと
               values_from = value)     #値が入っている列
 
