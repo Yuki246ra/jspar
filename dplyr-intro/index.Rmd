@@ -538,7 +538,7 @@ full_joined_data
 
 次は、データを縦に結合する方法。`bind_rows()`はxとyで共通する列は縦に結合し、共通しない列は`NA`を使って新規列が作られる。以下の例だと、idだけが共通する列である。
 
-```{r bind_rows, exercise=TRUE}
+```{r bind_rows, exercise=TRUE, exercise.setup="sample_data_join"}
 bind_rows(data_x, data_y)
 
 ```
