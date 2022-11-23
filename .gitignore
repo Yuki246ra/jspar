@@ -63,3 +63,4 @@ old/
 renv/
 *.html
 
+*test.Rmd
