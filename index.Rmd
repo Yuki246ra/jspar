@@ -3,7 +3,7 @@ title: "jaspr-intro"
 author: "jspar"
 date: "`r Sys.Date()`"
 tutorial:
-  id: "net.yukin.jspar.dplyr-intro"
+  id: "net.yukin.jspar"
   version: 0.2
 output: 
   learnr::tutorial:
