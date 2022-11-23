@@ -315,9 +315,9 @@ data_p %>%
   relocate(starts_with("condition"))
 ```
 
-### データフレームの行の並べ替え `order()`
+### データフレームの行の並べ替え `arrange()`
 
-`dplyr::order()`でデータフレームを並べ替える事ができます。
+`dplyr::arrange()`でデータフレームを並べ替える事ができます。
 
 ```{r order1, exercise=TRUE}
 data_q %>% arrange(q1)
