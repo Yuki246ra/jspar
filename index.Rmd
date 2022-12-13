@@ -1,12 +1,14 @@
 ---
-title: "jaspr-intro"
-author: "jspar"
+title: "jspar-intro"
+author: "written by jspar project"
 date: "`r Sys.Date()`"
 tutorial:
-  id: "net.yukin.jspar"
-  version: 0.2
+  id: "researchwithr.ga"
+  version: 0.5
 output: 
   learnr::tutorial:
+    includes: 
+      in_header: header.html
       progressive: false
       language:
         en:
@@ -38,6 +40,12 @@ tutorial_options(exercise.timelimit = 10)
 そこでこのページでは、RとRのtidyverseパッケージの便利な関数を、実例とともに紹介します。
 
 研究の効率化を少しでもお助けできれば幸いです。
+
+## コンテンツリスト
+- [dplyrを使ったデータ処理](https://researchwitr.ga/dplyr-intro)
+
+今後少しずつコンテンツを増やしていきたいと考えています。
+
 
 ## 想定する対象
 

@@ -3,10 +3,12 @@ title: "dplyr-intro"
 author: "written by jspar project"
 date: "`r paste('last update:', Sys.Date())`"
 tutorial: 
-  id: "net.yukin.jspar.dplyr-intro"
+  id: "researchwithr.ga/dplyr-intro"
   version: 0.3
 output: 
   learnr::tutorial:
+    includes: 
+      in_header: ../header.html
       progressive: false
       number_sections: false
       language:
