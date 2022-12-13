@@ -1,5 +1,5 @@
 ---
-title: "jspar-intro"
+title: "研究に生かすR"
 author: "written by jspar project"
 date: "`r Sys.Date()`"
 tutorial:
@@ -7,6 +7,7 @@ tutorial:
   version: 0.5
 output: 
   learnr::tutorial:
+  #html_document:
     includes: 
       in_header: header.html
     progressive: false
@@ -21,45 +22,235 @@ output:
           startover: 最初から
           previoustopic: 前のトピック
           nexttopic: 次のトピック
+          solution: 答えを見る
 runtime: shiny_prerendered
 ---
 
 ```{r setup, include=FALSE}
-library(tidyverse)
+#library(tidyverse)
 library(magrittr)
 library(learnr)
+
+## start-over-automatically-at-everyaccess
+options(tutorial.storage = list(
+  # save an arbitrary R object "data" to storage
+  save_object = function(tutorial_id, tutorial_version, user_id, object_id, data) {},
+  # retreive a single R object from storage
+  get_object = function(tutorial_id, tutorial_version, user_id, object_id) {NULL},
+  # retreive a list of all R objects stored
+  get_objects = function(tutorial_id, tutorial_version, user_id) {list()},
+  # remove all stored R objects
+  remove_all_objects = function(tutorial_id, tutorial_version, user_id) {}
+))
+
 
 tutorial_options(exercise.timelimit = 10)
 ```
 
-# 趣旨
-研究データは普段Excelで扱ってるけども、コピペミスやら数式ミスやらで頭を抱えたことは無いでしょうか。
+# Rの便利知識
 
-また、Rというとっつきにくいけど便利なツールがあるらしいと聞いたけども、やっぱりとっつきにくくて使えていない方もいるかも知れません。
+このページでは、本格的に*R*を使ったデータ処理を紹介する前に、*R*を使う上での基本的な操作や便利な使い方を紹介しています。すぐに各セクションに飛ぶための[目次はこちら](#コンテンツリスト)です。\
 
-そこでこのページでは、RとRのtidyverseパッケージの便利な関数を、実例とともに紹介します。
+## 趣旨
 
-研究の効率化を少しでもお助けできれば幸いです。
+このサイトは[日本生理人類学会](https://jspa.net)の若手の会のメンバーを中心に、*R*を使って研究を効率化する方法をシェアしようという趣旨で立ち上げました。
+
+フリーの統計ソフトである[R](https://www.r-project.org/)は、[tidyverse](https://www.tidyverse.org/)などのパッケージの力を借りると、データ操作がとても楽になります。
+
+そこでこのサイトでは、*R*を使ったデータ操作を、生データを読み込むところからデータをプロットする（論文に使う図を作る）までの流れに沿ってご紹介します。\
+なので、*R*の本懐である統計処理に関しては、他のサイトに譲りたいと思います。
+
+*R*の関数を紹介するときは、ブラウザ内で試しに*R*のコマンドが動かせるようになってますので、いろいろとコマンドを書き換えて動作を確認してみてください。
 
 ## コンテンツリスト
-- [dplyrを使ったデータ処理](https://researchwitr.ga/dplyr-intro)
+
+`dplyr`などを使った生データの読み込み～データフレーム操作～データ書き出しの方法について
+
+-   [Rによるデータフレーム操作](https://researchwithr.ga/dplyr-intro)
 
 今後少しずつコンテンツを増やしていきたいと考えています。
 
+## 統合開発環境Rstudio
 
-## 想定する対象
+*R*はR単体をインストールするだけでももちろん使用できますが、圧倒的に絶対的にRstudioを使った方が使いやすくなります。
 
-## 前準備
+何がそんなにいいのかはここではあえて触れませんが、とにかくRを使いたかったらRをインストールした後にRstudioもインストールしてください。
 
-```{r, eval=FALSE}
-library(tidyverse)
+研究用途（非営利）であれば無料で使えますし、入れない理由が見当たりません。
+
+Rstudioをインストールしたら、Rを使うときはRを起動するのではなくRstudioを起動してください。Rstudioの中でRが動いてるので、Rstudioを介してRを使うイメージです。
+
+## 関数の使い方の調べ方
+
+Rでは関数名の後に()を付けて、処理したいデータや処理内容を引数として関数に渡します。\
+そこで、関数の使い方（引数の設定の仕方）が分からなくなったときは、まずは関数のヘルプを見てみましょう。
+
+すべての関数のヘルプは、`?関数名`か、`help(関数名)`で見ることができます。
+
+例えば、数値の平均を計算してくれる`mean()`関数のヘルプを見たいときは以下のようにします。(WEB上では文字化けしてしまったので、ご自身のRで試してみてください)
+
+### 先頭に`?`を付ける
+
+```{r how_to_help, exercise=FALSE}
+?mean
+
 ```
 
-## pipe
+ちなみにもし、関数名も曖昧にしか思い出せないときは、`??`のように?を二つにすると曖昧検索も行ってくれます。
 
-## help
+### ヘルプ関数を使う
+
+```{r how_to_help2, exercise=FALSE}
+help(mean)
+
+```
+
+英語で書かれたヘルプを読むのは大変ですが、ネット上で日本語の説明を探す時間を考えると、頑張ってヘルプを読んだ方が早いこともよくあります。\
+
+### パッケージの説明を読む
+
+パッケージの作者によっては、vignetteというパッケージの紹介を書いてくれている場合があります。\
+vignetteはそのまま`vignette()`関数を使ってみることができます。
+
+```{r, eval=FALSE}
+vignette("dplyr")
+```
+
+また、先に紹介した`??`を使っても、vignetteがあるかどうか確認できます。
+
+```{r}
+??dplyr
+```
+
+## 値の代入方法
+
+執筆中です。
+
+## パイプの使い方
+
+だんだん*R*に慣れてくると、一つの変数（値）に複数の処理を行いたいときが出てきます。\
+そういったときにパイプ演算子`%>%`が使えると、プログラミングの幅が広がります。
+
+例えば、
+
+1.  1,3,4,5,7,8の平均を計算して
+
+2.  小数点第2でまるめ
+
+3.  文字列とくっつけて
+
+4.  コンソールに表示
+
+することを考えます。
+
+そういったときには、
+
+### 毎回変数に格納したり、、、
+
+```{r pipe1, exercise=TRUE}
+
+var <- c(1,3,4,5,7,8)
+var_mean <- mean(var, na.rm = T)
+var_round <- round(var_mean, digits = 2)
+var_paste <- paste("the mean value is", var_round, sep = " ")
+print(var_paste)
+
+```
+
+### 関数の入れ子が幾重にも重なってしまったり、、、
+```{r pipe2, exercise=TRUE}
+var <- c(1,3,4,5,7,8)
+print(paste("the mean value is", round(mean(var, na.rm = T), digits = 2), sep = " "))
+
+```
+
+といった経験がありませんか？
+
+どちらも間違いではないですが、不必要に変数が増えてしまったり、うっかり変数を上書きしたり、どの引数がどの関数のものかわかりにくくなったりと、後から見返して頭を抱える事態になったりします。
+
+そこで、  
+
+### パイプを使った処理の連結
+をすると、一連の処理を読みやすく書くことができます。
+
+```{r pipe3, exercise=TRUE}
+
+var <- c(1,3,4,5,7,8)
+var %>% 
+  mean(na.rm = T) %>% 
+  round(digits = 2) %>% 
+  paste("the mean value is", sep = " ") %>% 
+  print()
+
+```
+
+パイプ演算子`%>%`は、`%>%`の左側の結果を、`%>%`の右側の関数の第1引数に代入してくれます。\
+なので、処理の対象を第1引数にとる関数であれば、第1引数を省略して上のような処理の連鎖を書くことができます。
+
+そしてこの性質から、上のパイプの例は少し望んでない結果が得られているのが分かるでしょうか。
+
+### 第1引数以外に左辺の結果を代入する
+上の例では`paste()`関数の最初に`4.67`が入るのは望ましくありません（`the mean value is`の後に入ってほしい）。\
+こういったときは、明示的に`.`を引数として挿入することで、左辺の結果を右辺のどこに代入したいのかを指示することができます。
+
+下に先ほどと全く同じコードを用意しておいたので、出力が`the mean value is 4.67`となるように、以下のコードを修正して実行してみてください。\
+すぐに答えが知りたい人は、「答えを見る」ボタンから見ることができます。
+
+```{r pipe4, exercise=TRUE}
+
+var <- c(1,3,4,5,7,8)
+var %>% 
+  mean(na.rm = T) %>% 
+  round(digits = 2) %>% 
+  paste("the mean value is", sep = " ") %>%
+  print()
+
+```
+
+```{r pipe4-solution}
+var <- c(1,3,4,5,7,8)
+var %>% 
+  mean(na.rm = T) %>% 
+  round(digits = 2) %>% 
+  paste("the mean value is", ., sep = " ") %>% #ここの第2引数に.を入れて、数字が入る場所を指定する
+  print()
+```
+
+### その他のパイプ演算子
+`magrittr`パッケージのパイプ演算子は`%>%`だけでなく、`{}`を使った分岐や処理結果の途中での取り出し`%T>%`などにも対応しています。
+
+要望があればこのあたりも追加していきます。
+
+なお、`vignette("magrittr")`で作者による説明が読めます。
+
+
+## このサイトを構築した時のメモ
+
+※　マニアックな話になります。
+
+### ウェブページの作成`shiny web app`と`learnr`パッケージ
+
+*R*のコードを実際に試せるように、*R*を使ったウェブアプリを作れるshiny web appという仕組みを使いました。具体的には、`learnr`パッケージを使ったRmarkdownファイルを書いて、それをshiny-serverで実行（htmlにレンダリング）してウェブページを作っています。
+
+### サーバー
+Oracle Cloud Infrastructure（OCI）のAlways Free枠（無料枠）を使っています。
+
+GoogleのGCPの無料枠はアメリカリージョンしか使えないのに対して、OCIは東京や大阪リージョンが無料で使えるので、shiny web appのような重いコンテンツを配信するときは特にその差が出やすいようです。
+
+また、OCIの無料枠の中でもamd64ではなくarm64(aarch64)ベースのCPUを選択するとかなりスペックが良くなるのでそちらを選択しましたが、これに伴う試行錯誤もいずれ機会があれば書きたいと思います。
+
+### dockerを使った環境構築
+
+Dockerのコンテナを使うと、Rがプリインストールされた環境を作れたり、またその環境をベースに別の環境を作れたりと、柔軟な環境構築（と削除）ができて試行錯誤するには便利でした。
+
+Dockerは今回が初めてでしたが、環境を固定できたりバックアップが簡単に取れるなど、研究でR環境を用意するときにも便利そうでした。
 
 ## shiny-test
+
+shiny appをRmarkdown内で実行する方法を試しています。
+
+今後更新予定です。
+
 ```{r eruptions, echo=FALSE}
 inputPanel(
   selectInput("n_breaks", label = "Number of bins:",
