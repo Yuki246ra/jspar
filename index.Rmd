@@ -9,18 +9,18 @@ output:
   learnr::tutorial:
     includes: 
       in_header: header.html
-      progressive: false
-      language:
-        en:
-          text:
-            startover: リセットする
-          button:
-            runcode: コードを実行
-            continue: 続ける
-            copyclipboard: クリップボードにコピー
-            startover: 最初から
-            previoustopic: 前のトピック
-            nexttopic: 次のトピック
+    progressive: false
+    language:
+      en:
+        text:
+          startover: リセットする
+        button:
+          runcode: コードを実行
+          continue: 続ける
+          copyclipboard: クリップボードにコピー
+          startover: 最初から
+          previoustopic: 前のトピック
+          nexttopic: 次のトピック
 runtime: shiny_prerendered
 ---
 

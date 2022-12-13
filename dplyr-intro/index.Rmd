@@ -4,24 +4,24 @@ author: "written by jspar project"
 date: "`r paste('last update:', Sys.Date())`"
 tutorial: 
   id: "researchwithr.ga/dplyr-intro"
-  version: 0.3
+  version: 0.5
 output: 
   learnr::tutorial:
     includes: 
       in_header: ../header.html
-      progressive: false
-      number_sections: false
-      language:
-        en:
-          text:
-            startover: リセットする
-          button:
-            runcode: コードを実行
-            continue: 続ける
-            copyclipboard: クリップボードにコピー
-            startover: リセットする
-            previoustopic: 前のトピック
-            nexttopic: 次のトピック
+    progressive: false
+    number_sections: false
+    language:
+      en:
+        text:
+          startover: リセットする
+        button:
+          runcode: コードを実行
+          continue: 続ける
+          copyclipboard: クリップボードにコピー
+          startover: リセットする
+          previoustopic: 前のトピック
+          nexttopic: 次のトピック
 runtime: shiny_prerendered
 ---
 
