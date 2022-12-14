@@ -60,6 +60,8 @@ data_p <- read_csv("data/data_phyis.csv", show_col_types = F)
 
 ここでは主に、データの読み込み -\> 整形/変形 -\> 書き出し　に関する方法を紹介します。
 
+[トップページ](https://researchwithr.ga)では、関数のヘルプの見方やパイプ演算子`%>%`の使い方を記載していますので、そちらも御覧ください。
+
 このチュートリアルは`learnr`パッケージを使用して書かれており、ソースコードは[こちら](https://github.com/Yuki246ra/jspar "github/jspar")で公開しています。 項目の追加リクエストや、バグレポートは[GitHub](https://github.com/Yuki246ra/jspar/issues "github/jspar")にてお願いします。
 
 ## はじめに
