@@ -4,7 +4,7 @@ author: "written by jspar project"
 date: "`r Sys.Date()`"
 tutorial:
   id: "researchwithr.ga"
-  version: 0.5
+  version: 0.6
 output: 
   learnr::tutorial:
   #html_document:
