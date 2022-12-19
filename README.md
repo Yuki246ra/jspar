@@ -1,12 +1,10 @@
 # About
 
-このリポジトリでは、https://researchwithr.ga で公開しているRの使い方解説サイトのソースコードを公開するとともに、\
-サイトに対する要望やバグレポートを受け付けています。
+このリポジトリでは、https://researchwithr.ga で公開しているRの使い方解説サイトのソースコードを公開するとともに、サイトに対する要望やバグレポートを受け付けています。
 
 # Discussions
 
-[サイト](https://researchwithr.ga)についての質問だけでなく、\
-サイト内で紹介しているRのtipsについての質問は\
+[サイト](https://researchwithr.ga)についての質問だけでなく、サイト内で紹介しているRのtipsについての質問は\
 当リポジトリの[Discussions](https://github.com/Yuki246ra/jspar/discussions)にお寄せください。
 
 # Issues
