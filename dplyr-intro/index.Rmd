@@ -1,10 +1,10 @@
 ---
-title: "dplyr-intro"
+title: "dplyrを使ったデータフレーム操作"
 author: "written by jspar project"
 date: "`r paste('last update:', Sys.Date())`"
 tutorial: 
   id: "researchwithr.ga/dplyr-intro"
-  version: 0.5
+  version: 0.6
 output: 
   learnr::tutorial:
     includes: 
