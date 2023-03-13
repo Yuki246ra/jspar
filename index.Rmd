@@ -5,6 +5,7 @@ date: "`r Sys.Date()`"
 tutorial:
   id: "researchwithr.ga"
   version: 0.6
+lang: ja
 output: 
   learnr::tutorial:
   #html_document:
