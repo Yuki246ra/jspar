@@ -15,20 +15,50 @@
 <meta name="allow-skip" content="false" />
 <meta name="learnr-version-prerender" content="0.11.2" />
 
-<title>dplyr-intro</title>
+<title>dplyrを使ったデータフレーム操作</title>
 
 <!-- header-includes START -->
 <link rel="shortcut icon" type="image/x-icon" href="https://jspar.yukin.net/images/favicon.ico" />
 
 <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-060Z00JKBP"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1GSMEX48NM"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', 'G-060Z00JKBP');
+  gtag('config', 'G-1GSMEX48NM');
 </script>
+
+
+
+<style>
+*{box-sizing: border-box;}
+
+ul.gnav-navi-1{
+background: #152547;
+padding: 0;
+text-align: center;
+}
+ul.gnav-navi-1 li{
+display: inline-block;
+}
+
+
+ul.gnav-navi-1 li a{
+display: block;
+padding: 1em;
+color: #fff;
+text-decoration: none;
+}
+ul.gnav-navi-1 a::first-line{
+font-size: 1.6rem;
+font-weight: bold;
+}
+ul.gnav-navi-1 li:hover{
+background: #2f96c2;
+}
+</style>
 <!-- HEAD_CONTENT -->
 <!-- header-includes END -->
 <!-- HEAD_CONTENT -->
@@ -115,6 +145,14 @@ if (window.hljs) {
 <a class='sr-only sr-only-focusable visually-hidden-focusable' href='#learnr-tutorial-content'>Skip to Tutorial Content</a>
 
 
+<nav>
+<ul class="gnav-navi-1">
+<li><a href="https://researchwithr.ga">TOP</a></li>
+<li><a href="https://researchwithr.ga/dplyr-intro">dplyrを使ったデータ操作</a></li>
+<li><a href="#">ggplot2を使った作図（準備中）</a></li>
+<li><a href="https://github.com/Yuki246ra/jspar/discussions" target="_blank" rel="noopener noreferrer">質問する(github)</a></li>
+</ul>
+</nav>
 
 <div class="pageContent band">
 <main class="bandContent page">
@@ -123,8 +161,16 @@ if (window.hljs) {
 
 <div id="section-rdplyrを使ったデータ操作" class="section level1">
 <h1>R(dplyr)を使ったデータ操作</h1>
-<p>ここでは主に、データの読み込み -&gt; 整形/変形 -&gt; 書き出し　に関する方法を紹介します。</p>
-<p>このチュートリアルは<code>learnr</code>パッケージを使用して書かれており、ソースコードは<a href="https://github.com/Yuki246ra/jspar" title="github/jspar">こちら</a>で公開しています。 項目の追加リクエストや、バグレポートは<a href="https://github.com/Yuki246ra/jspar/issues" title="github/jspar">GitHub</a>にてお願いします。</p>
+<p>ここでは主に、データの読み込み -&gt; 整形/変形 -&gt;
+書き出し　に関する方法を紹介します。</p>
+<p><a
+href="https://researchwithr.ga">トップページ</a>では、関数のヘルプの見方やパイプ演算子<code>%&gt;%</code>の使い方を記載していますので、そちらも御覧ください。</p>
+<p>このチュートリアルは<code>learnr</code>パッケージを使用して書かれており、ソースコードは<a
+href="https://github.com/Yuki246ra/jspar"
+title="github/jspar">こちら</a>で公開しています。
+項目の追加リクエストや、バグレポートは<a
+href="https://github.com/Yuki246ra/jspar/issues"
+title="github/jspar">GitHub</a>にてお願いします。</p>
 <div id="section-はじめに" class="section level2">
 <h2>はじめに</h2>
 <p>研究においてデータクリーニングは欠かせません。</p>
@@ -135,17 +181,21 @@ if (window.hljs) {
 <p><a href="#section-データ構造の把握">データ構造の把握</a></p>
 <p><a href="#section-列の絞り込み">列の絞り込み</a></p>
 <p><a href="#section-行の絞り込み">行の絞り込み</a></p>
-<p><a href="#section-データフレームの並べ替え">データフレームの並べ替え</a></p>
+<p><a
+href="#section-データフレームの並べ替え">データフレームの並べ替え</a></p>
 <p><a href="#section-列の追加編集">列の追加/編集</a></p>
-<p><a href="#section-ロングデータとワイドデータの変換">ロングデータとワイドデータの変換</a></p>
+<p><a
+href="#section-ロングデータとワイドデータの変換">ロングデータとワイドデータの変換</a></p>
 <p><a href="#section-データフレームの結合">データフレームの結合</a></p>
 <p><a href="#section-データの書き出し">データの書き出し</a></p>
 </div>
 <div id="section-このサイトの使い方" class="section level3">
 <h3>このサイトの使い方</h3>
 <p>このサイトでは、Rが皆さんのPCにインストールされていなくても、ブラウザ内でRのコマンドを実行し結果を見ることができます。</p>
-例えば下の1行目に <code>1 +</code>と入力しておいたので、<code>1 + 1</code>と数式を完成させてから、「▶コードを実行」を押してみてください。
-<div class="tutorial-exercise" data-label="inst" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+例えば下の1行目に
+<code>1 +</code>と入力しておいたので、<code>1 + 1</code>と数式を完成させてから、「▶コードを実行」を押してみてください。
+<div class="tutorial-exercise" data-label="inst" data-completion="1"
+data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>1 + </code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
@@ -166,20 +216,23 @@ if (window.hljs) {
 <div id="section-csvの読み込み-read_csv" class="section level3">
 <h3>csvの読み込み <code>read_csv()</code></h3>
 <p><code>read.table()</code>関数など使える関数はいくつかありますが、<code>readr</code>パッケージの<code>read_csv()</code>関数を使います。</p>
-<div class="tutorial-exercise" data-label="read_csv" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="read_csv" data-completion="1"
+data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>data_q &lt;- read_csv(&quot;data/data_questionnaire.csv&quot;)
 data_p &lt;- read_csv(&quot;data/data_phyis.csv&quot;)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
 </div>
-<div id="section-excelブックの読み込み-read_excel" class="section level3">
+<div id="section-excelブックの読み込み-read_excel"
+class="section level3">
 <h3>Excelブックの読み込み <code>read_excel()</code></h3>
 <p><code>readxl::read_excel()</code>を使うと、.xlsファイルと.xlsxファイルが読み込める。</p>
 <p>ここでは紹介にとどめるので、気になる人は関数のヘルプを見てみてください。</p>
 <pre class="r"><code>## excelファイルの読み込み
 data_xlsx &lt;- readxl::read_excel(&quot;sample.xlsx&quot;, sheet = &quot;sheet1&quot;, na = c(&quot;#N/A&quot;, &quot;&quot;, &quot;NA&quot;))</code></pre>
 </div>
-<div id="section-excelをコピーしたクリップボードの中身の読み取り" class="section level3">
+<div id="section-excelをコピーしたクリップボードの中身の読み取り"
+class="section level3">
 <h3>Excelをコピーしたクリップボードの中身の読み取り</h3>
 <p>本格的なコーディングをする前の準備段階では、クリップボードを使ったほうが楽だったりすることもある。ここではWindowsを前提に説明しますが、ググったらMacやLinuxでの方法も出てきます。</p>
 <p>Excelの表を範囲選択してからコピーし、Rで以下のコマンドをタイプすると読み込めるはずです。なお、Excelのクリップボードへのコピーはタブ区切りになるので、<code>sep = "\t"</code>と指定します。データに列名が含まれない場合は、<code>header = FALSE</code>とします。</p>
@@ -190,7 +243,9 @@ data_xlsx &lt;- readxl::read_excel(&quot;sample.xlsx&quot;, sheet = &quot;sheet1
 <h3>複数ファイルを読み込む</h3>
 <p><code>list.files()</code>関数を使うと、カレントディレクトリ（作業フォルダ）にあるファイルの一覧が取得できます。<code>pattern = ""</code>を使うと、一覧に採用するファイルを絞り込める。</p>
 <p>このCSVファイル一覧を使って、すべてのファイルの読み込みを一つのコマンドでまとめて行う。</p>
-<div class="tutorial-exercise" data-label="list_files" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="list_files"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>file.list &lt;- list.files(pattern = &quot;.csv&quot;, path = &quot;data/&quot;, full.names = T)
 
 file.list</code></pre>
@@ -199,7 +254,9 @@ file.list</code></pre>
 <div id="section-lapplyを使って行う方法" class="section level4">
 <h4><code>lapply()</code>を使って行う方法</h4>
 <p>結果は一つのリストに入ります。</p>
-<div class="tutorial-exercise" data-label="read_csv_list" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="read_csv_list"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>result &lt;- lapply(file.list, read_csv)
 
 result[[1]]
@@ -207,8 +264,12 @@ result[[1]]
 result[[2]]</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
-<p><code>for()</code>文を使う方法。ここでは、<code>assign()</code>関数を使って、別々の変数にデータを格納します。変数名はもともとのファイル名を使用しました。 データフレームを作って、その下に<a href="#section-データフレームの結合">結合</a>することも可能です（メモリ効率が悪いが人間にはわかりやすい方法）。</p>
-<div class="tutorial-exercise" data-label="read_csv_for" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<p><code>for()</code>文を使う方法。ここでは、<code>assign()</code>関数を使って、別々の変数にデータを格納します。変数名はもともとのファイル名を使用しました。
+データフレームを作って、その下に<a
+href="#section-データフレームの結合">結合</a>することも可能です（メモリ効率が悪いが人間にはわかりやすい方法）。</p>
+<div class="tutorial-exercise" data-label="read_csv_for"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>for (i in 1:length(file.list)) {
   result &lt;- read_csv(file.list[i])
   assign(str_replace_all(file.list[i], &quot;data//|.csv&quot;, &quot;&quot;), result)  #linux vs windowsで/に対するエスケープの要否が異なる。
@@ -227,11 +288,15 @@ result[[2]]</code></pre>
 <div id="section-構造を表示する" class="section level3">
 <h3>構造を表示する</h3>
 <p>base::str()やdplyr::glimpse()は、データの構造を確認するのに便利。</p>
-<div class="tutorial-exercise" data-label="data_structure1" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="data_structure1"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>data_q %&gt;% str()</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
-<div class="tutorial-exercise" data-label="data_structure2" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="data_structure2"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>data_q %&gt;% glimpse()</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
@@ -239,7 +304,8 @@ result[[2]]</code></pre>
 <div id="section-列名を確認する" class="section level3">
 <h3>列名を確認する</h3>
 <p>データフレームの列名だけ取得したいとき</p>
-<div class="tutorial-exercise" data-label="colnames" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="colnames" data-completion="1"
+data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>data_q %&gt;% colnames()</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
@@ -252,12 +318,16 @@ result[[2]]</code></pre>
 <h3>列名を直接指定する</h3>
 <p>select()関数の第２引数以降に取り出したい列の名前を直接タイプします。</p>
 <p>例えば、data_pのidと条件１のデータだけほしい時は以下のようにします。他の列名も試してみよう。</p>
-<div class="tutorial-exercise" data-label="select_direct" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="select_direct"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>data_p %&gt;% select(id, condition1)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
 <p>列の順番がわかっている場合は、コロンで繋いだ範囲を取り出すこともできます。</p>
-<div class="tutorial-exercise" data-label="select_range" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="select_range"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>data_q %&gt;% select(id, q6:q10)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
@@ -271,24 +341,31 @@ result[[2]]</code></pre>
 <li>列名検索_含有 <code>contains()</code></li>
 <li>列名検索_正規表現 <code>matches()</code></li>
 <li>指定する変数名全て <code>all_of()</code></li>
-<li>指定する変数名全て <code>any_of()</code> 指定した変数名が存在しなくてもエラーにならない</li>
+<li>指定する変数名全て <code>any_of()</code>
+指定した変数名が存在しなくてもエラーにならない</li>
 </ul>
 <p><code>starts_with()</code>を使った例を下に示すので、他の方法も試してみよう。</p>
-<div class="tutorial-exercise" data-label="starts_with" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="starts_with"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>data_p %&gt;% select(starts_with(&quot;cond&quot;))</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
 </div>
 <div id="section-列のデータ型や内容で絞り込む" class="section level3">
 <h3>列のデータ型や内容で絞り込む</h3>
-<p><code>where()</code> 関数を併用すると、列のデータ型などで絞り込める。</p>
+<p><code>where()</code>
+関数を併用すると、列のデータ型などで絞り込める。</p>
 <ul>
 <li><code>where(is.numeric)</code>数値列のみ</li>
 <li><code>where(is.factor)</code>因子型の列のみ</li>
-<li><code>where(~is.numeric &amp;&amp; mean(.) &gt; 0)</code> 数値型の列でかつ列内の平均が０を超える</li>
+<li><code>where(~is.numeric &amp;&amp; mean(.) &gt; 0)</code>
+数値型の列でかつ列内の平均が０を超える</li>
 </ul>
 <p><code>where(is.factor)</code>の例を下に示す。</p>
-<div class="tutorial-exercise" data-label="select_where" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="select_where"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>#idとgroup列をfactor型にする
 data_p$id &lt;- as.factor(data_p$id) #mutate()を使った方法は後ほど
 data_p$group &lt;- as.factor(data_p$group) #mutate()を使った方法は後ほど
@@ -300,21 +377,28 @@ data_p %&gt;% select(where(is.factor))</code></pre>
 <div id="section-その他" class="section level3">
 <h3>その他</h3>
 <p>また、上記の関数の先頭に<code>-</code>や<code>!</code>をつけると、<strong>条件に当てはまる列を削除</strong>できます。</p>
-<div class="tutorial-exercise" data-label="select_inv" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="select_inv"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>data_p %&gt;% select(-group)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
 <ul>
 <li>すべて<code>everything()</code></li>
 <li>指定する変数名全て <code>all_of()</code></li>
-<li>指定する変数名全て <code>any_of()</code> 指定した変数名が存在しなくてもエラーにならない</li>
+<li>指定する変数名全て <code>any_of()</code>
+指定した変数名が存在しなくてもエラーにならない</li>
 </ul>
-<div class="tutorial-exercise" data-label="select_other" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="select_other"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>data_p %&gt;% select(group, everything())</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
 <p>以下のコードはエラーになります。どこを直せばよいだろうか。</p>
-<div class="tutorial-exercise" data-label="select_other2" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="select_other2"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>var_list &lt;- c(&quot;id&quot;, &quot;condition&quot;)
 
 data_p %&gt;% select(all_of(var_list))</code></pre>
@@ -327,16 +411,20 @@ data_p %&gt;% select(all_of(var_list))</code></pre>
 <p>dplyr::filter()関数を使うと、データフレームから特定の行を抽出する事ができます。</p>
 <div id="section-因子型や文字列型で直接指定" class="section level3">
 <h3>因子型（や文字列型）で直接指定</h3>
-<div class="tutorial-exercise" data-label="filter" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="filter" data-completion="1"
+data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>group_a &lt;- data_p %&gt;% filter(group == &quot;a&quot;)
 
 group_a %&gt;% summary()</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
 </div>
-<div id="section-ある列の各セルに特定の文字が含まれるかどうか" class="section level3">
+<div id="section-ある列の各セルに特定の文字が含まれるかどうか"
+class="section level3">
 <h3>ある列の各セルに特定の文字が含まれるかどうか</h3>
-<div class="tutorial-exercise" data-label="filt_str_detect" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="filt_str_detect"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>filt_char &lt;- iris %&gt;% filter(str_detect(Species, &quot;ni|ve&quot;))
 summary(filt_char)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
@@ -345,7 +433,8 @@ summary(filt_char)</code></pre>
 <div id="section-数値的な基準" class="section level3">
 <h3>数値的な基準</h3>
 <p>ある列の数値を基準にします。別の数字を試してみよう。</p>
-<div class="tutorial-exercise" data-label="filt_num" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="filt_num" data-completion="1"
+data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>num_filt &lt;- data_q %&gt;% filter(q1 &gt; 0.5)
 summary(num_filt)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
@@ -354,7 +443,9 @@ summary(num_filt)</code></pre>
 <div id="section-計算した数値的な基準を使う" class="section level3">
 <h3>計算した数値的な基準を使う</h3>
 <p>たとえば、ある列の各セルがその列の平均値を超えるかどうかで絞ることもできます。</p>
-<div class="tutorial-exercise" data-label="filt_num_auto" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="filt_num_auto"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>num_filt2 &lt;- data_q %&gt;% filter(q1 &gt; mean(q1))
 summary(num_filt2)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
@@ -363,26 +454,32 @@ summary(num_filt2)</code></pre>
 </div>
 <div id="section-データフレームの並べ替え" class="section level2">
 <h2>データフレームの並べ替え</h2>
-<div id="section-データフレームの列の並べ替え-relocate" class="section level3">
+<div id="section-データフレームの列の並べ替え-relocate"
+class="section level3">
 <h3>データフレームの列の並べ替え <code>relocate()</code></h3>
-<p><code>dplyr::relocate()</code>で列の並べ替えができます。引数に、先頭に持ってきたい列を左から順番に指定します。ここでは列名を直接タイプしたり、先述した<code>starts_with()</code>や<code>matches()</code>、<code>all_of()</code>などのselecting functionsをつかった列指定が可能です。</p>
+<p><code>dplyr::relocate()</code>で列の並べ替えができます。引数に、先頭に持ってきたい列を左から順番に指定します。ここでは列名を直接タイプしたり、先述した<code>starts_with()</code>や<code>matches()</code>、<code>all_of()</code>などのselecting
+functionsをつかった列指定が可能です。</p>
 <p>なお、<code>relocate(列指定)</code>は<code>select(列指定, everything())</code>と同義。試してみよう。</p>
-<div class="tutorial-exercise" data-label="relocate" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="relocate" data-completion="1"
+data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>data_p %&gt;% 
   relocate(starts_with(&quot;condition&quot;))</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
 </div>
-<div id="section-データフレームの行の並べ替え-arrange" class="section level3">
+<div id="section-データフレームの行の並べ替え-arrange"
+class="section level3">
 <h3>データフレームの行の並べ替え <code>arrange()</code></h3>
 <p><code>dplyr::arrange()</code>でデータフレームを並べ替える事ができます。</p>
-<div class="tutorial-exercise" data-label="order1" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="order1" data-completion="1"
+data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>data_q %&gt;% arrange(q1)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
 <div id="section-複数条件での並び替え" class="section level4">
 <h4>複数条件での並び替え</h4>
-<div class="tutorial-exercise" data-label="order2" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="order2" data-completion="1"
+data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>data_q %&gt;% arrange(q1, q2, q3)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
@@ -390,7 +487,8 @@ summary(num_filt2)</code></pre>
 <div id="section-降順での並べ替え" class="section level4">
 <h4>降順での並べ替え</h4>
 <p>desc()で列名を囲ってやると指定した列は降順になります。</p>
-<div class="tutorial-exercise" data-label="order3" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="order3" data-completion="1"
+data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>data_q %&gt;% arrange(desc(q1))</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
@@ -404,8 +502,10 @@ summary(num_filt2)</code></pre>
 <p>なので、既存のデータフレームに変更を加えるときは<code>mutate()</code>、新しいデータフレームを作りたいときは<code>tranmsmute()</code>を使うことが多いです。ここでは、<code>mutate()</code>を実例に処理方法を説明します。</p>
 <div id="section-新しい列を追加する" class="section level3">
 <h3>新しい列を追加する</h3>
-<p>mutate()の中で、新しい列名 = 実施する処理を書くと、指定した新しい列に処理結果が代入されます。</p>
-<div class="tutorial-exercise" data-label="mutate1" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<p>mutate()の中で、新しい列名 =
+実施する処理を書くと、指定した新しい列に処理結果が代入されます。</p>
+<div class="tutorial-exercise" data-label="mutate1" data-completion="1"
+data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>result &lt;- data_q %&gt;% 
   mutate(new_col_num  = q1 + q2,
          new_col_bool = q1 &gt; 3)
@@ -416,19 +516,24 @@ result %&gt;% select(id, q1:q2, starts_with(&quot;new&quot;))</code></pre>
 </div>
 <div id="section-既存の列を上書きする" class="section level3">
 <h3>既存の列を上書きする</h3>
-<p>mutate()の中で、既存の列名 = 実施する処理を書くと、指定した既存の列に処理結果が上書きされます。</p>
-<div class="tutorial-exercise" data-label="mutate2" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<p>mutate()の中で、既存の列名 =
+実施する処理を書くと、指定した既存の列に処理結果が上書きされます。</p>
+<div class="tutorial-exercise" data-label="mutate2" data-completion="1"
+data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>result &lt;- data_q %&gt;% 
   mutate(id  = as.factor(id)) #id列を因子型に変換する
 
 result %&gt;% select(id, q1:q2)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
-<div id="section-注意-meanやsdなど引数をvectorでとる関数の場合" class="section level4">
+<div id="section-注意-meanやsdなど引数をvectorでとる関数の場合"
+class="section level4">
 <h4>注意　<code>mean()</code>や<code>sd()</code>など引数をvectorでとる関数の場合</h4>
 <p>一部の関数は引数をvectorで取るため、以下の様な処理は望んだ結果が得られない。</p>
 <p>1列目に<code>relocate()</code>で持ってきたsum列が全行で同じ数値になっているのを確認してみよう。</p>
-<div class="tutorial-exercise" data-label="mean_fail" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="mean_fail"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>result &lt;- data_q %&gt;% 
   mutate(sum = sum(q1, q2, q3))
 
@@ -436,7 +541,9 @@ result %&gt;% relocate(sum)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
 <p>この様な関数を使うときは、予め行ごとの処理を命令<code>rowwise()</code>しておく必要がある。また、<code>rowwise()</code>はのちの集計作業<code>summarise()</code>などに影響したりするので、必要な処理が終わったら<code>ungroup()</code>しておくことをおすすめします。</p>
-<div class="tutorial-exercise" data-label="mean_workaround" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="mean_workaround"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>result &lt;- data_q %&gt;%
   rowwise() %&gt;% 
   mutate(sum = sum(q1, q2, q3)) %&gt;% 
@@ -448,7 +555,8 @@ result %&gt;% select(q1:q3, sum)</code></pre>
 <p>更に、<code>q1:q3</code>といったセミコロン<code>:</code>で列を指定する場合は、<code>rowwise()</code>に加えて<code>c_across()</code>で列名をくくってやる必要がある。</p>
 <p>これは、行毎の計算に必要な処理であって、以下の例の<code>select()</code>のように、列選択だけでは<code>c_across()</code>は必要ない。正直わかりにくいのでなんとかしてほしいですよね。</p>
 <p>個人的には、<code>mutate(acorss(cols, .fns))</code>という形で列と処理を一括で指定する方法をおすすめしたい。（後述予定）</p>
-<div class="tutorial-exercise" data-label="c_across" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="c_across" data-completion="1"
+data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>result &lt;- data_q %&gt;%
   rowwise() %&gt;% 
   mutate(sum = sum(c_across(q1:q3))) %&gt;% 
@@ -460,15 +568,20 @@ result %&gt;% select(q1:q3, sum)</code></pre>
 </div>
 </div>
 </div>
-<div id="section-ロングデータとワイドデータの変換" class="section level2">
+<div id="section-ロングデータとワイドデータの変換"
+class="section level2">
 <h2>ロングデータとワイドデータの変換</h2>
 <p>今サンプルとして用いている<code>data_q</code>も<code>data_p</code>もどちらも、ワイドデータ（繰り返し測定が別の列として表現される）と呼ばれるデータ形式になっています。</p>
 <p>この形式は人間には分かり易いが、コンピューターにはわかりにくいため、統計ソフトなどではロングデータ（データフレーム内に計測値は1列しかなく、繰り返し測定は列名ではなくセルの値で表現される）が求められることも多いです。</p>
 <p>そこで、ここではワイドデータからロングデータ、そしてロングデータからワイドデータの変換方法を説明します。</p>
-<div id="section-ワイドデータロングデータ-pivot_longer" class="section level3">
+<div id="section-ワイドデータロングデータ-pivot_longer"
+class="section level3">
 <h3>ワイドデータ→ロングデータ <code>pivot_longer()</code></h3>
-<p>改めて<code>data_p</code>のデータ構造を確認してみよう。1:100の<code>id</code>（参加者ID）, aとbで構成される（被験者間要因の）<code>group</code>、そして繰り返し測定の<code>condition1:condition4</code>がある。</p>
-<div class="tutorial-exercise" data-label="pivot_longer" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<p>改めて<code>data_p</code>のデータ構造を確認してみよう。1:100の<code>id</code>（参加者ID）,
+aとbで構成される（被験者間要因の）<code>group</code>、そして繰り返し測定の<code>condition1:condition4</code>がある。</p>
+<div class="tutorial-exercise" data-label="pivot_longer"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>data_p %&gt;%
   mutate(group = as.factor(group)) %&gt;% 
   str()</code></pre>
@@ -476,7 +589,9 @@ result %&gt;% select(q1:q3, sum)</code></pre>
 </div>
 <p>ここで、ロングデータを作ったときに想定される列は、<code>id, group, condition, value</code>となります。idとgroupは中身は変わらないが繰り返し分で縦に長くなり、conditionにはcondition1~4のいずれかが入り、valueは計測値が入る。</p>
 <p>この関数一つで、エクセル作業からずいぶん開放されますね！</p>
-<div class="tutorial-exercise" data-label="pivot_longer2" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="pivot_longer2"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>long_data &lt;- data_p %&gt;% 
   pivot_longer(cols = condition1:condition4, #計測値の入っている列範囲
                names_to = &quot;condition&quot;,       #新しく作る条件用の列名
@@ -486,10 +601,13 @@ long_data</code></pre>
 </div>
 <p>100行のワイドデータが400行のロングデータになっただろうか。</p>
 </div>
-<div id="section-ロングデータワイドデータ-pivot_wider" class="section level3">
+<div id="section-ロングデータワイドデータ-pivot_wider"
+class="section level3">
 <h3>ロングデータ→ワイドデータ <code>pivot_wider()</code></h3>
 <p>続いて、今作った<code>long_data</code>をワイドデータにしてみよう。つまり、もともとの<code>data_p</code>と同じ形に戻すことになります。</p>
-<div class="tutorial-exercise" data-label="pivot_wider" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="pivot_wider"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>wide_data &lt;- long_data %&gt;% 
   pivot_wider(id_cols = id:group,      #idや条件を示す列
               names_from = condition,  #ワイドデータの列名のもと
@@ -499,7 +617,9 @@ wide_data</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
 <p>もとのデータと見比べてみよう</p>
-<div class="tutorial-exercise" data-label="comp_data" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="comp_data"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>str(data_p)
 
 str(wide_data)</code></pre>
@@ -509,11 +629,13 @@ str(wide_data)</code></pre>
 </div>
 <div id="section-データフレームの結合" class="section level2">
 <h2>データフレームの結合</h2>
-<div id="section-データフレームの横結合-joinファミリー" class="section level3">
+<div id="section-データフレームの横結合-joinファミリー"
+class="section level3">
 <h3>データフレームの横結合 <code>joinファミリー</code></h3>
 <p>データフレームを横方向に結合（して新しいデータフレームを作る）するには、以下のjoin系の関数を使います。</p>
 <ul>
-<li><code>inner_join()</code> xとyの両方に含まれる行（共通する行）を使う</li>
+<li><code>inner_join()</code>
+xとyの両方に含まれる行（共通する行）を使う</li>
 <li><code>left_join()</code> xに含まれるすべての行を使う</li>
 <li><code>right_join()</code> yに含まれるすべての行を使う</li>
 <li><code>full_join()</code> xとyに含まれる行をすべて使う</li>
@@ -523,7 +645,9 @@ str(wide_data)</code></pre>
 <p>これら<code>data_x</code>と<code>data_y</code>をjoin系の関数で結合してみます。</p>
 <div id="section-inner_join" class="section level4">
 <h4><code>inner_join()</code></h4>
-<div class="tutorial-exercise" data-label="inner_join" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="inner_join"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>joined_data &lt;- inner_join(data_x, data_y, by = &quot;id&quot;)
 
 joined_data</code></pre>
@@ -534,7 +658,9 @@ joined_data</code></pre>
 <div id="section-left_join-right_join" class="section level4">
 <h4><code>left_join()</code> / <code>right_join()</code></h4>
 <p>次は、left_join()とright_join()を同じデータに使って挙動を確認してみる。</p>
-<div class="tutorial-exercise" data-label="left_right_join" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="left_right_join"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>left_joined_data &lt;- left_join(data_x, data_y, by = &quot;id&quot;)
 
 right_joined_data &lt;- right_join(data_x, data_y, by = &quot;id&quot;)
@@ -548,7 +674,9 @@ right_joined_data</code></pre>
 <div id="section-full_join" class="section level4">
 <h4><code>full_join()</code></h4>
 <p><code>full_join()</code>は両方のデータフレームを尊重して結合がおこわなれる。</p>
-<div class="tutorial-exercise" data-label="full_join" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="full_join"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>full_joined_data &lt;- full_join(data_x, data_y, by = &quot;id&quot;)
 
 full_joined_data</code></pre>
@@ -564,10 +692,13 @@ full_joined_data</code></pre>
 </ul>
 </div>
 </div>
-<div id="section-データフレームの縦結合-bind_rows" class="section level3">
+<div id="section-データフレームの縦結合-bind_rows"
+class="section level3">
 <h3>データフレームの縦結合 <code>bind_rows()</code></h3>
 <p>次は、データを縦に結合する方法。<code>bind_rows()</code>はxとyで共通する列は縦に結合し、共通しない列は<code>NA</code>を使って新規列が作られる。以下の例だと、idだけが共通する列である。</p>
-<div class="tutorial-exercise" data-label="bind_rows" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="bind_rows"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>bind_rows(data_x, data_y)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
@@ -578,7 +709,9 @@ full_joined_data</code></pre>
 <div id="section-csv形式での書き出し" class="section level3">
 <h3>CSV形式での書き出し</h3>
 <p><code>readr::write_excel_csv()</code>では、エクセルで読み込むのに都合の良いCSVを書き出してくれる。</p>
-<div class="tutorial-exercise" data-label="write_csv" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="write_csv"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>write_excel_csv(data_p, &quot;data/write_data_to.csv&quot;)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
@@ -591,9 +724,12 @@ full_joined_data</code></pre>
 <div id="section-バイナリ形式での書き出し" class="section level3">
 <h3>バイナリ形式での書き出し</h3>
 <p>.Rdata形式でデータを保存しておくと、データ型の指定などを保ったままデータを保存できます。が基本Rでしか読み込めないです。</p>
-<p><code>save()</code>は特定の変数を保存するのに使います。<code>save.image()</code>は現在のGlobal Environment内の全変数をまとめて保存できます。</p>
+<p><code>save()</code>は特定の変数を保存するのに使います。<code>save.image()</code>は現在のGlobal
+Environment内の全変数をまとめて保存できます。</p>
 <p>なお、.Rdataの読み込みは<code>load()</code>でできます。</p>
-<div class="tutorial-exercise" data-label="write_Rdata" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise" data-label="write_Rdata"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0">
 <pre class="text"><code>save(data_p, file = &quot;data_p.Rdata&quot;)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
@@ -630,9 +766,10 @@ data_p <- read_csv("data/data_phyis.csv", show_col_types = F)
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
-learnr:::register_http_handlers(session, metadata = list(id = "researchwithr.ga/dplyr-intro", version = 0.5))
+learnr:::register_http_handlers(session, metadata = list(id = "researchwithr.ga/dplyr-intro", version = 0.6))
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::prepare_tutorial_state(session)
 </script>
@@ -640,7 +777,8 @@ learnr:::prepare_tutorial_state(session)
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::i18n_observe_tutorial_language(input, session)
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 session$onSessionEnded(function() {
         learnr:::event_trigger(session, "session_stop")
@@ -653,7 +791,8 @@ output$`tutorial-exercise-inst-output` <- renderUI({
   `tutorial-exercise-inst-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "inst", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -699,7 +838,8 @@ output$`tutorial-exercise-read_csv-output` <- renderUI({
   `tutorial-exercise-read_csv-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "read_csv", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -747,7 +887,8 @@ output$`tutorial-exercise-list_files-output` <- renderUI({
   `tutorial-exercise-list_files-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "list_files", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -795,7 +936,8 @@ output$`tutorial-exercise-read_csv_list-output` <- renderUI({
   `tutorial-exercise-read_csv_list-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "read_csv_list", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -846,7 +988,8 @@ output$`tutorial-exercise-read_csv_for-output` <- renderUI({
   `tutorial-exercise-read_csv_for-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "read_csv_for", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -899,7 +1042,8 @@ output$`tutorial-exercise-data_structure1-output` <- renderUI({
   `tutorial-exercise-data_structure1-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "data_structure1", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -946,7 +1090,8 @@ output$`tutorial-exercise-data_structure2-output` <- renderUI({
   `tutorial-exercise-data_structure2-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "data_structure2", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -993,7 +1138,8 @@ output$`tutorial-exercise-colnames-output` <- renderUI({
   `tutorial-exercise-colnames-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "colnames", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1040,7 +1186,8 @@ output$`tutorial-exercise-select_direct-output` <- renderUI({
   `tutorial-exercise-select_direct-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "select_direct", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1087,7 +1234,8 @@ output$`tutorial-exercise-select_range-output` <- renderUI({
   `tutorial-exercise-select_range-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "select_range", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1134,7 +1282,8 @@ output$`tutorial-exercise-starts_with-output` <- renderUI({
   `tutorial-exercise-starts_with-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "starts_with", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1181,7 +1330,8 @@ output$`tutorial-exercise-select_where-output` <- renderUI({
   `tutorial-exercise-select_where-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "select_where", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1231,7 +1381,8 @@ output$`tutorial-exercise-select_inv-output` <- renderUI({
   `tutorial-exercise-select_inv-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "select_inv", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1278,7 +1429,8 @@ output$`tutorial-exercise-select_other-output` <- renderUI({
   `tutorial-exercise-select_other-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "select_other", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1325,7 +1477,8 @@ output$`tutorial-exercise-select_other2-output` <- renderUI({
   `tutorial-exercise-select_other2-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "select_other2", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1373,7 +1526,8 @@ output$`tutorial-exercise-filter-output` <- renderUI({
   `tutorial-exercise-filter-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "filter", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1420,7 +1574,8 @@ output$`tutorial-exercise-filt_str_detect-output` <- renderUI({
   `tutorial-exercise-filt_str_detect-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "filt_str_detect", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1468,7 +1623,8 @@ output$`tutorial-exercise-filt_num-output` <- renderUI({
   `tutorial-exercise-filt_num-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "filt_num", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1516,7 +1672,8 @@ output$`tutorial-exercise-filt_num_auto-output` <- renderUI({
   `tutorial-exercise-filt_num_auto-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "filt_num_auto", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1564,7 +1721,8 @@ output$`tutorial-exercise-relocate-output` <- renderUI({
   `tutorial-exercise-relocate-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "relocate", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1611,7 +1769,8 @@ output$`tutorial-exercise-order1-output` <- renderUI({
   `tutorial-exercise-order1-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "order1", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1658,7 +1817,8 @@ output$`tutorial-exercise-order2-output` <- renderUI({
   `tutorial-exercise-order2-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "order2", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1705,7 +1865,8 @@ output$`tutorial-exercise-order3-output` <- renderUI({
   `tutorial-exercise-order3-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "order3", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1752,7 +1913,8 @@ output$`tutorial-exercise-mutate1-output` <- renderUI({
   `tutorial-exercise-mutate1-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "mutate1", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1800,7 +1962,8 @@ output$`tutorial-exercise-mutate2-output` <- renderUI({
   `tutorial-exercise-mutate2-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "mutate2", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1848,7 +2011,8 @@ output$`tutorial-exercise-mean_fail-output` <- renderUI({
   `tutorial-exercise-mean_fail-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "mean_fail", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1896,7 +2060,8 @@ output$`tutorial-exercise-mean_workaround-output` <- renderUI({
   `tutorial-exercise-mean_workaround-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "mean_workaround", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1945,7 +2110,8 @@ output$`tutorial-exercise-c_across-output` <- renderUI({
   `tutorial-exercise-c_across-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "c_across", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -1994,7 +2160,8 @@ output$`tutorial-exercise-pivot_longer-output` <- renderUI({
   `tutorial-exercise-pivot_longer-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "pivot_longer", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -2042,7 +2209,8 @@ output$`tutorial-exercise-pivot_longer2-output` <- renderUI({
   `tutorial-exercise-pivot_longer2-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "pivot_longer2", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -2093,7 +2261,8 @@ output$`tutorial-exercise-pivot_wider-output` <- renderUI({
   `tutorial-exercise-pivot_wider-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "pivot_wider", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -2147,7 +2316,8 @@ output$`tutorial-exercise-comp_data-output` <- renderUI({
   `tutorial-exercise-comp_data-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "comp_data", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -2201,7 +2371,8 @@ output$`tutorial-exercise-inner_join-output` <- renderUI({
   `tutorial-exercise-inner_join-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "inner_join", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -2253,7 +2424,8 @@ output$`tutorial-exercise-left_right_join-output` <- renderUI({
   `tutorial-exercise-left_right_join-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "left_right_join", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -2306,7 +2478,8 @@ output$`tutorial-exercise-full_join-output` <- renderUI({
   `tutorial-exercise-full_join-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "full_join", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -2358,7 +2531,8 @@ output$`tutorial-exercise-bind_rows-output` <- renderUI({
   `tutorial-exercise-bind_rows-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "bind_rows", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -2409,7 +2583,8 @@ output$`tutorial-exercise-write_csv-output` <- renderUI({
   `tutorial-exercise-write_csv-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "write_csv", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -2456,7 +2631,8 @@ output$`tutorial-exercise-write_Rdata-output` <- renderUI({
   `tutorial-exercise-write_Rdata-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "write_Rdata", global_setup = structure(c("library(learnr)", 
 "#library(tidyverse)", "library(magrittr)", "library(dplyr)", 
@@ -2504,7 +2680,7 @@ learnr:::store_exercise_cache(structure(list(label = "write_Rdata", global_setup
 <!--/html_preserve-->
 <!--html_preserve-->
 <script type="application/shiny-prerendered" data-context="execution_dependencies">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66]}},"value":[{"type":"character","attributes":{},"value":["assertthat","backports","base","bit","bit64","bslib","cachem","checkmate","cli","compiler","crayon","curl","datasets","DBI","digest","dplyr","ellipsis","evaluate","fansi","fastmap","generics","glue","graphics","grDevices","hms","htmltools","htmlwidgets","httpuv","jquerylib","jsonlite","knitr","later","learnr","lifecycle","magrittr","methods","mime","parallel","pillar","pkgconfig","promises","purrr","R6","Rcpp","readr","rlang","rmarkdown","rprojroot","sass","shiny","stats","stringi","stringr","tibble","tidyr","tidyselect","tools","tzdb","utf8","utils","vctrs","vroom","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["0.2.1","1.4.1","4.2.2","4.0.5","4.0.5","0.4.1","1.0.6","2.1.0","3.4.1","4.2.2","1.5.2","4.3.3","4.2.2","1.1.3","0.6.31","1.0.10","0.3.2","0.18","1.0.3","1.1.0","0.1.3","1.6.2","4.2.2","4.2.2","1.1.2","0.5.4","1.5.4","1.6.6","0.1.4","1.8.4","1.41","1.3.0","0.11.2","1.0.3","2.0.3","4.2.2","0.12","4.2.2","1.8.1","2.0.3","1.2.0.1","0.3.5","2.5.1","1.0.9","2.1.3","1.0.6","2.18","2.0.3","0.4.4","1.7.3","4.2.2","1.7.8","1.5.0","3.1.8","1.2.1","1.2.0","4.2.2","0.3.0","1.2.2","4.2.2","0.5.1","1.6.0","2.5.0","0.35","1.8-4","2.3.6"]}]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67]}},"value":[{"type":"character","attributes":{},"value":["assertthat","backports","base","bit","bit64","bslib","cachem","checkmate","cli","compiler","crayon","curl","datasets","DBI","digest","dplyr","ellipsis","evaluate","fansi","fastmap","generics","glue","graphics","grDevices","hms","htmltools","htmlwidgets","httpuv","jquerylib","jsonlite","knitr","later","learnr","lifecycle","magrittr","methods","mime","parallel","pillar","pkgconfig","promises","purrr","R6","Rcpp","readr","rlang","rmarkdown","rprojroot","rstudioapi","sass","shiny","stats","stringi","stringr","tibble","tidyr","tidyselect","tools","tzdb","utf8","utils","vctrs","vroom","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["0.2.1","1.4.1","4.2.2","4.0.5","4.0.5","0.4.1","1.0.6","2.1.0","3.4.1","4.2.2","1.5.2","4.3.3","4.2.2","1.1.3","0.6.31","1.0.10","0.3.2","0.18","1.0.3","1.1.0","0.1.3","1.6.2","4.2.2","4.2.2","1.1.2","0.5.4","1.5.4","1.6.6","0.1.4","1.8.4","1.41","1.3.0","0.11.2","1.0.3","2.0.3","4.2.2","0.12","4.2.2","1.8.1","2.0.3","1.2.0.1","0.3.5","2.5.1","1.0.9","2.1.3","1.0.6","2.18","2.0.3","0.14","0.4.4","1.7.3","4.2.2","1.7.8","1.5.0","3.1.8","1.2.1","1.2.0","4.2.2","0.3.0","1.2.2","4.2.2","0.5.1","1.6.0","2.5.0","0.35","1.8-4","2.3.6"]}]}]}
 </script>
 <!--/html_preserve-->
 </div>
@@ -2520,9 +2696,9 @@ learnr:::store_exercise_cache(structure(list(label = "write_Rdata", global_setup
 
 <!-- begin doc-metadata -->
 <div id="doc-metadata">
-<h1 class="title toc-ignore" style="display:none;">dplyr-intro</h1>
+<h1 class="title toc-ignore" style="display:none;">dplyrを使ったデータフレーム操作</h1>
 <h4 class="author"><em>written by jspar project</em></h4>
-<h4 class="date"><em>last update: 2022-12-13</em></h4>
+<h4 class="date"><em>last update: 2023-03-13</em></h4>
 </div>
 <!-- end doc-metadata -->
 
