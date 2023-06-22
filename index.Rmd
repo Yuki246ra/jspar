@@ -3,7 +3,7 @@ title: "研究に生かすR"
 author: "written by jspar project"
 date: "`r Sys.Date()`"
 tutorial:
-  id: "researchwithr.ga"
+  id: "jspar.yukin.net"
   version: 0.6
 lang: ja
 output: 
@@ -68,7 +68,7 @@ tutorial_options(exercise.timelimit = 10)
 
 `dplyr`などを使った生データの読み込み～データフレーム操作～データ書き出しの方法について
 
--   [Rによるデータフレーム操作](https://researchwithr.ga/dplyr-intro)
+-   [Rによるデータフレーム操作](https://jspar.yukin.net/dplyr-intro)
 
 今後少しずつコンテンツを増やしていきたいと考えています。
 
