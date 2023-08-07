@@ -1,0 +1,246 @@
+---
+title: "R講習会-導入コース"
+author: "written by jspar project"
+date: "`r paste('last update:', Sys.Date())`"
+tutorial: 
+  id: "researchwithr.ga/r-basics"
+  version: 0.1
+lang: ja
+output: 
+  learnr::tutorial:
+    includes: 
+      in_header: ../header.html
+      before_body: ../gnavi.html
+    progressive: false
+    number_sections: false
+    language:
+      en:
+        text:
+          startover: リセットする
+        button:
+          runcode: コードを実行
+          continue: 続ける
+          copyclipboard: クリップボードにコピー
+          startover: リセットする
+          previoustopic: 前のトピック
+          nexttopic: 次のトピック
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(tidyverse)
+library(magrittr)
+
+knitr::opts_chunk$set(error = TRUE)
+
+tutorial_options(exercise.timelimit = 10)
+
+## start-over-automatically-at-everyaccess
+options(tutorial.storage = list(
+  # save an arbitrary R object "data" to storage
+  save_object = function(tutorial_id, tutorial_version, user_id, object_id, data) {},
+  # retreive a single R object from storage
+  get_object = function(tutorial_id, tutorial_version, user_id, object_id) {NULL},
+  # retreive a list of all R objects stored
+  get_objects = function(tutorial_id, tutorial_version, user_id) {list()},
+  # remove all stored R objects
+  remove_all_objects = function(tutorial_id, tutorial_version, user_id) {}
+))
+
+data_q <- read_csv("data/data_questionnaire.csv", show_col_types = F)
+data_p <- read_csv("data/data_phyis.csv", show_col_types = F)
+
+#setwd("data")
+```
+
+## 準備
+
+**このセクションのゴール**
+
+1.  今回使うパッケージを読み込むことができる。
+
+2.  カレントディレクトリを理解し、フォルダの中身を確認して目当てのCSVファイルを見つけられる。
+
+### 必要なパッケージの読み込み
+
+rではパッケージを追加することで様々な機能を追加することができます。\
+ここでは、データ操作が楽になる`magrittr`パッケージと`tidyverse`パッケージを読み込みます。
+
+まだパッケージをインストールしていないときは、`install.packages("tidyverse")`をコンソールに入力してエンターを押すことでインストールできます。(tidyverseパッケージをインストールすると、magrittrパッケージも併せてインストールされます)
+
+```{r prep, exercise=TRUE}
+library(magrittr)
+library(tidyverse)
+```
+
+### フォルダの中身を確認する
+
+`list.files()`を使って、カレントディレクトリ（作業フォルダ）内にあるファイルを一覧を取得します。
+
+```{r listfiles, exercise=TRUE}
+list.files()
+```
+
+*data*フォルダがあることが確認できます。
+
+#### サブフォルダ内の中身を確認する
+
+さらに深い階層のフォルダの中身を見るには、カレントディレクトリから見たパスを引数に追加します。
+
+```{r listfiles2, exercise=TRUE}
+#dataフォルダの中身
+list.files("data")
+
+#dataフォルダの中のsubfolderの中身
+list.files("data/subfolder")
+
+```
+
+### 作業フォルダの変更
+
+`setwd()`関数を使うと、カレントディレクトリ（作業フォルダ）を変更することができます。\
+`getwd()`関数で現在の作業フォルダを確認できます。
+
+```{r listfiels3, exercise=FALSE}
+#作業ディレクトリの変更
+setwd("data")
+
+#作業フォルダの確認
+getwd()
+
+#再度中身を確認する
+list.files()
+
+```
+
+これで最低限の準備が整いました。続いてCSVファイルの読み込みに取り掛かりましょう。
+
+## CSVファイルの読み込み
+
+このセクションのゴール
+
+1.  とりあえずCSVファイルが読み込める
+
+2.  CSVファイルの構造を確認できる
+
+### とりあえず読み込んでみる
+
+CSVファイルを読み込む方法はいくつかありますが、ここでは`readr`パッケージの`read_csv()`関数を使います。
+
+`csv_data`という変数に対して、CSVの中身を代入しましょう。\
+ここではデータファイル以外は指定しない（デフォルト設定）で読み込みます。
+
+※ `read_csv()`では返り値がデータフレームではなく、便利なtibbleというデータフレームの亜種になります。
+
+```{r readcsv, exercise=TRUE}
+csv_data <- read_csv("data/data_phyis.csv")
+
+```
+
+### 読み込んだデータを確認する
+
+変数名(今回は`csv_data`)をコンソールに直打ちすると、変数の中身が表示されます。
+
+足りない文字を入力してから実行してみましょう。
+
+```{r readcsv2, exercise=TRUE, exercise.setup = "readcsv"}
+csv_da
+```
+
+先ほどの`read_csv()`を実行した時のメッセージと今回の表示結果から、id, group, sex, age, condition1\~3の合計7列（18行）のデータが読み込まれたことが分かります。
+
+### 読み込んだデータの構造を確認する
+
+`str()`関数を使うと、データの構造（structure）が確認できます。
+
+```{r readcsv3, exercise=TRUE, exercise.setup = "readcsv"}
+csv_data %>% str()
+```
+
+`id`,`age`, `condition1~3`列が数値型(num)、`group`と`sex`列が文字型(char)となっています。
+
+## 読み込んだデータを操作する
+
+**このセクションのゴール**
+
+1.  表をgroup, sex順に並べ替えることができる。
+
+2.  group列をfactor型に変更できる。
+
+3.  新しい列（`over40`)を追加できる。
+
+### 表を並べ替える
+
+`arrange()`関数を使うと、表を並べ替えることができます。\
+以下の例だと、年齢順に表を並べ替えています。
+
+さらに、`desc()`で列名をかこってやると、指定した列が降順になります。
+
+```{r arrange1, exercise=TRUE, exercise.setup = "readcsv"}
+#年齢順（昇順）
+csv_data %>% arrange(age)
+
+#年齢順 (降順)
+csv_data %>% arrange(desc(age))
+
+```
+
+上のコードでは処理結果がコンソールに表示されるだけで変数には保存（代入）されないので、保存しておきます。
+
+```{r arrange2, exercise=TRUE, exercise.setup = "readcsv"}
+csv_data <- csv_data %>% arrange(age)
+```
+
+#### 複数条件での並べ替え
+
+`arrange()`内で複数の列を指定すると、複数の列を基準に並べ替えることができます。
+
+下の例では、男女内でさらに年齢（降順）で並べ変えています。
+
+```{r arrange3, exercise=TRUE, exercise.setup = "readcsv"}
+csv_data %>% arrange(sex, desc(age))
+
+```
+
+### 列の変数型を変える
+
+`mutate()` 関数を使うと、表の既存の列を上書きしたり、表に新しい列を追加したりできます。
+
+基本的な使い方： mutate(代入先の列名 = 代入するデータ）
+
+#### 上書き
+
+代入先の列名に既に存在する列名を指定すると、既存の列が上書きされます。
+
+```{r mutate1, exercise=TRUE, exercise.setup = "readcsv"}
+csv_data %>% 
+  arrange(id) %>% 
+  mutate(sex = case_when(sex == "f" ~ "female",
+                         sex == "m" ~ "male"))
+
+```
+
+### 新しい列を作る
+
+代入先の列名に表内に存在しない列名を指定すると、新しい列が末尾に追加されます。
+
+```{r mutate2, exercise=TRUE, exercise.setup = "readcsv"}
+
+csv_data <- 
+  csv_data %>% 
+  arrange(id) %>% 
+  mutate(over40 = age > 40)
+```
+
+#### 列を並べ替える
+
+`relocate()`関数を使うと、列の順番を並べ替えられます。
+
+以下の例では、`over40`列を`age`列の後ろに配置しました。
+
+```{r relocate1, exercise=TRUE, exercise.setup = "mutate2"}
+csv_data %>% 
+  relocate(over40, .after = age)
+
+```
