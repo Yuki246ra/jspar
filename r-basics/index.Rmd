@@ -213,6 +213,8 @@ csv_data %>% arrange(sex, desc(age))
 
 代入先の列名に既に存在する列名を指定すると、既存の列が上書きされます。
 
+`sex`の表記を書き換える例
+
 ```{r mutate1, exercise=TRUE, exercise.setup = "readcsv"}
 csv_data %>% 
   arrange(id) %>% 
@@ -221,11 +223,20 @@ csv_data %>%
 
 ```
 
+`group`をfactor型に変更する例
+
+```{r mutate2, exercise=TRUE, exercise.setup = "mutate1"}
+csv_data <- csv_data %>% 
+  mutate(group = as.factor(group))
+
+csv_data
+```
+
 ### 新しい列を作る
 
 代入先の列名に表内に存在しない列名を指定すると、新しい列が末尾に追加されます。
 
-```{r mutate2, exercise=TRUE, exercise.setup = "readcsv"}
+```{r mutate3, exercise=TRUE, exercise.setup = "mutate2"}
 
 csv_data <- 
   csv_data %>% 
@@ -237,10 +248,27 @@ csv_data <-
 
 `relocate()`関数を使うと、列の順番を並べ替えられます。
 
+何も指定しなければ、引数に指定した列が先頭に来て、残りの列が元の順番で続きます。
+
+```{r relocate0, exercise=TRUE, exercise.setup = "mutate2"}
+csv_data %>% 
+  relocate(age)
+
+```
+
 以下の例では、`over40`列を`age`列の後ろに配置しました。
 
 ```{r relocate1, exercise=TRUE, exercise.setup = "mutate2"}
 csv_data %>% 
+  mutate(over40 = age > 40) %>% 
   relocate(over40, .after = age)
+
+```
+
+ちなみに、`mutate()`関数で新しい変数を作る際などにも`.after`は指定できます。
+
+```{r mutate4, exercise=TRUE, exercise.setup = "mutate2"}
+csv_data %>% 
+  mutate(over40 = age > 40, .after = age)
 
 ```
