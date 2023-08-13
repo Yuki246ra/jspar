@@ -74,9 +74,17 @@ library(magrittr)
 ### データの準備
 
 
-```{r prep_data, exersize=TRUE}
+```{r prep_data, exercize=TRUE}
 data_iris <- iris %>% 
   as_tibble()
+
+```
+
+###
+
+```{r ggplot2_1, exercise=TRUE}
+
+ggplot(data_iris)
 
 ```
 
