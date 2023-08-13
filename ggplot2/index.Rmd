@@ -49,8 +49,11 @@ options(tutorial.storage = list(
   remove_all_objects = function(tutorial_id, tutorial_version, user_id) {}
 ))
 
-data_q <- read_csv("data/data_questionnaire.csv", show_col_types = F)
-data_p <- read_csv("data/data_phyis.csv", show_col_types = F)
+data_q <- read_csv("../r-basics/data/data_questionnaire.csv", show_col_types = F)
+data_p <- read_csv("../r-basics/data/data_phyis.csv", show_col_types = F)
+
+data_iris <- iris %>% 
+  as_tibble()
 
 #setwd("data")
 ```
@@ -60,3 +63,22 @@ data_p <- read_csv("data/data_phyis.csv", show_col_types = F)
 **このセクションのゴール**
 
 1.  今回使うパッケージを読み込むことができる。
+
+### パッケージの読み込み
+
+```{r prep, exercise=TRUE}
+library(tidyverse)
+library(magrittr)
+```
+
+### データの準備
+
+
+```{r prep_data, exersize=TRUE}
+data_iris <- iris %>% 
+  as_tibble()
+
+```
+
+
+
