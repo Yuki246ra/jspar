@@ -27,11 +27,10 @@ output:
 runtime: shiny_prerendered
 ---
 
-
 ```{r setup, include=FALSE}
 library(learnr)
 library(tidyverse)
-library(magrittr)
+#library(magrittr)
 
 knitr::opts_chunk$set(error = TRUE)
 
@@ -49,7 +48,7 @@ options(tutorial.storage = list(
   remove_all_objects = function(tutorial_id, tutorial_version, user_id) {}
 ))
 
-data_q <- read_csv("../r-basics/data/data_questionnaire.csv", show_col_types = F)
+#data_q <- read_csv("../r-basics/data/data_questionnaire.csv", show_col_types = F)
 data_p <- read_csv("../r-basics/data/data_phyis.csv", show_col_types = F)
 
 data_iris <- iris %>% 
@@ -63,30 +62,144 @@ data_iris <- iris %>%
 **このセクションのゴール**
 
 1.  今回使うパッケージを読み込むことができる。
+2.  `data_p`をプロット用にロングデータに変換できる。
+3.  ggplot2のキャンバスを用意できる。
 
 ### パッケージの読み込み
 
+`tidyverse`パッケージを読み込むと、今回使う`ggplot2`も併せて読み込まれます。
+
 ```{r prep, exercise=TRUE}
 library(tidyverse)
-library(magrittr)
+
 ```
 
 ### データの準備
 
+ggplotでは、１行が１観測で１列が１変数という整然データ（ロングデータ）のデータを用意する必要があります。
 
-```{r prep_data, exercize=TRUE}
+```{r prep_data, exercise=TRUE}
 data_iris <- iris %>% 
   as_tibble()
 
+data_iris #構造を確認しておく
+
 ```
 
-###
+#### ワイドデータのロングデータへの変換
+
+`iris`は元から整然データなので問題ありませんが、サンプルで用意している`data_p`はワイドデータ（condition1\~3が横並び）なので、データを少し変形する必要があります。
+
+`pivot_longer()`を使うと、ワイドデータをロングデータに変換できます。
+
+-   `cols`で縦につなげたい列を一括で指定します。ここでは列名がconditionで始まる(starts_with)列を一括で指定しました。
+
+-   `names_to`で、縦につなげた列の列名を使って、conditionsという新しい列を作成するように指示しています。これがないと、縦につなげた後にどのデータがどの条件のものなのかわからなくなります。
+
+-   `values_to`で、condition1\~3の列にあった観測値を縦に一つにまとめた列の、新しい列名(values)を指定しています。
+
+```{r to_long, exercise=TRUE}
+data_p_long <- pivot_longer(data = data_p, #元データ
+                            cols = starts_with("condition"), #ロングデータにしたい列
+                            names_to = "conditions", #新しく作る条件を示す列の列名
+                            values_to = "values" #新しく作る観測値列の列名
+                            ) 
+
+data_p_long
+```
+
+コンソールに各データの変数名を入力して実行し、データの概要を把握しておいてください。また`data_p`と、`data_p_long`の違いを見てみてください。
+
+```{r conf_data, exercise=TRUE, exercise.setup = "to_long"}
+data_iris %>% 
+  summary()
+
+data_p
+
+data_p_long
+```
+
+18行7列だった`data_p`が、54(=18人\*3条件）行6列となりました。`id`や`group`,`sex`そして`age`列が1,1,1,2,2,2,3,3,3のように、必要な数だけ自動的に複製されています。`pivot_longer()`の`cols`で*指定しなかった列*はすべて、自動的に複製されます。
+
+### キャンバスの準備
+
+`ggplot2`を使ったプロットは、キャンバスを準備するところから始まります。キャンバスには、プロットに使うデータや、縦軸横軸に使う列名など、プロット全体に影響を及ぼす設定を盛り込みます。
+
+ほとんどの場面では、以下のような設定をします。
+
+-   data （第1引数） でプロットに使うデータを指定
+
+-   mapping = aes()で、x軸とy軸に使う列名を指定
+
+```{r prep_canvas, exercise=TRUE, exercise.setup="conf_data"}
+canvas_iris <- ggplot(data = data_iris, mapping = aes(x = Petal.Width, y = Sepal.Length))
+
+canvas_p <- ggplot(data = data_p_long, mapping = aes(x = conditions, y = value))
+
+```
+
+## プロット基礎１（散布図）
+
+**このセクションのゴール**
+
+1.  ggpot2を使って、散布図を描くことができる
+2.  散布図の各ポイントをirisのSpeciesごとに色分けできる
+3.  散布図の各ポイントをirisのSpeciesごとに形分けできる
+4.  散布図の各ポイントを半透明にできる
+
+### とりあえず散布図を描いてみる
+
+散布図は、先に用意したキャンバスに`geom_point()`を足すことで描画できます。
+
+キャンバスを作るときにx軸に`Petal.Width`, y軸に`Sepal.Length`を設定したので、その設定が利用されます。
+
+```{r scatter1, exercise = TRUE, exercise.setup = "prep_canvas"}
+
+scatter_iris <- canvas_iris + geom_point()
+
+```
+
+`scatter_iris`とコンソールに入力して、プロット結果を見てみましょう。
+
+```{r scatter2, exercise = TRUE, exercise.setup = "scatter1"}
+scatter_i
+```
+
+### グラフの色分け
+
+`ggplot2`では、様々な条件でグラフの見た目を変えることができます。まずは色分けをやってみましょう。
+
+キャンバスを作るときの`aes()`で、色分けに使う列を指定します。
+
+```{r scatter_colour1, exercise = TRUE, exercise.setup = "scatter1"}
+
+canvas_iris <- ggplot(data = data_iris, 
+                      mapping = aes(x = Petal.Width, 
+                                    y = Sepal.Length, 
+                                    color = Species)) # <- ここ！
+
+scatter_iris <- canvas_iris + geom_point() #散布図を指定
+
+scatter_iris
+
+```
+
+凡例も自動で追加されます。
+
+## プロット基礎２（棒グラフ）
+
+## プロット基礎３（ボックスプロット・バイオリンプロット）
+
+## プロット調整
+
+## プロット結合
+
+## プロットの保存
+
+## 
 
 ```{r ggplot2_1, exercise=TRUE}
 
 ggplot(data_iris)
 
 ```
-
-
-
