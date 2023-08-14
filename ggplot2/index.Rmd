@@ -178,7 +178,7 @@ canvas_iris <- ggplot(data = data_iris,
                                     y = Sepal.Length, 
                                     color = Species)) # <- ここ！
 
-scatter_iris <- canvas_iris + geom_point() #散布図を指定
+scatter_iris <- canvas_iris + geom_point(alpha = 0.5) #散布図を指定
 
 scatter_iris
 
@@ -186,9 +186,48 @@ scatter_iris
 
 凡例も自動で追加されます。
 
+実はここで描画したプロットには、同じ点に複数のデータが存在している箇所があります。そこで、各点の透明度を50%に設定して、再度実行してみましょう。透明度は`geom_point(alpha = 0.5)`のように小数で指定します。
+
+## プロット基礎2（ボックスプロット・バイオリンプロット）
+
+正規分布していないデータのプロットなどに便利なボックスプロットやバイオリンプロットも、`geom_boxplot()`や`geom_violin()`を使うと簡単に描画できます。
+
+ここでは、SpeciesごとにPetal.Lengthを比較してみましょう。
+
+```{r boxplot1, exercise=TRUE, exercise.setup="prep_canvas"}
+
+boxplot_iris <- ggplot(data = data_iris,
+                       mapping = aes(x = Species, 
+                                     y = Petal.Length,
+                                     colour = Species)) +
+  geom_boxplot()
+
+boxplot_iris
+
+```
+
+`geom_boxplot()`の中身を追加して、見栄えを調整した例がこちらです。
+
+```{r boxplot2, exercise=TRUE, exercise.setup="prep_canvas"}
+
+boxplot_iris <- ggplot(data = data_iris,
+                       mapping = aes(x = Species, 
+                                     y = Petal.Length,
+                                     colour = Species)) +
+  geom_boxplot(aes(fill = Species), # Species毎に塗りつぶす
+               show.legend = FALSE, #凡例を表示しない
+               alpha = 0.5, #塗りつぶしの濃さを薄めに
+               width = 0.4) #横幅を少し狭めに
+               #width = 0.5) 
+
+boxplot_iris
+```
+
 ## プロット基礎２（棒グラフ）
 
-## プロット基礎３（ボックスプロット・バイオリンプロット）
+棒グラフは
+
+## プロット基礎４（折れ線グラフ）
 
 ## プロット調整
 
