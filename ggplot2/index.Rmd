@@ -119,7 +119,7 @@ data_p
 data_p_long
 ```
 
-18行7列だった`data_p`が、54(=18人\*3条件）行6列となりました。`id`や`group`,`sex`そして`age`列が1,1,1,2,2,2,3,3,3のように、必要な数だけ自動的に複製されています。`pivot_longer()`の`cols`で*指定しなかった列*はすべて、自動的に複製されます。
+18行7列だった`data_p`が、54(=18人\*3条件）行6列となりました。`id`や`group`,`sex`そして`age`列が1,1,1,2,2,2,3,3,3のように、必要な数だけ自動的に複製されています。`pivot_longer()`の`cols`で指定しなかった列はすべて、自動的に複製されます。
 
 ### キャンバスの準備
 
@@ -218,14 +218,92 @@ boxplot_iris <- ggplot(data = data_iris,
                show.legend = FALSE, #凡例を表示しない
                alpha = 0.5, #塗りつぶしの濃さを薄めに
                width = 0.4) #横幅を少し狭めに
-               #width = 0.5) 
+               
 
 boxplot_iris
 ```
 
 ## プロット基礎２（棒グラフ）
 
-棒グラフは
+#### プロットする値の計算
+
+棒グラフはプロットに使う各数値（e.g., 平均、ばらつきの範囲）を計算して表にしておく必要があります。
+
+まずは`dplyr`パッケージの`group_by()`や`summarise()`を使って各数値を計算します。
+
+ここでは、先のボックスプロットと同様に、SpeciesごとのPetal.Lengthを平均±SDで示してみます。
+
+```{r barplot1, exercise=TRUE}
+data_iris_barplot <-
+  data_iris %>% 
+  group_by(Species) %>% #これ以降の処理をSpeciesごとに実行する
+  summarise(mean = mean(Petal.Length), #平均を計算
+            sd = sd(Petal.Length),#sdを計算
+            ymax = mean + sd, #上側の誤差範囲
+            ymin = mean - sd) #下側の誤差範囲
+
+data_iris_barplot
+```
+
+Speciesごとのmean, sd, ymax, yminを計算できました。これを使ってプロットしていきます。
+
+ggplot()で作ったキャンバスにgeom_bar()で棒グラフを追加しました。
+
+```{r barplot2, exercise=TRUE, exercise.setup = "barplot1"}
+barplot_iris <-
+  ggplot(data = data_iris_barplot,
+         mapping = aes(x = Species, y = mean)) + 
+  geom_bar(mapping = aes(colour = Species, #外枠の色
+                         fill = Species), #塗りつぶしの色
+           stat = "identity")  #棒グラフをかく
+ 
+barplot_iris
+
+```
+
+続いて、誤差範囲を追加しましょう。後から追加した要素がプロットの最前面に追加されます。
+
+```{r barplot3, exercise=TRUE, exercise.setup = "barplot1"}
+barplot_iris <- 
+  ggplot(data = data_iris_barplot,
+         mapping = aes(x = Species, y = mean)) + 
+  geom_bar(mapping = aes(colour = Species, #外枠の色
+                         fill = Species), #塗りつぶしの色
+           stat = "identity") + #棒グラフをかく
+  geom_errorbar(mapping = aes(ymin = ymin, ymax = ymax)) #誤差範囲を指定する
+
+barplot_iris
+```
+
+最後に、棒グラフや誤差範囲の横幅を調整、縦軸の軸名や範囲の修正をしたのがこちらです。
+
+`scale_y_continuous()`は、y軸（連続値）の各種設定をするための関数です。
+
+```{r barplot4, exercise=TRUE, exercise.setup = "barplot1"}
+barplot_iris3 <-
+  #キャンバスの準備
+  ggplot(data = data_iris_barplot, mapping = aes(x = Species, y = mean)) +
+  #棒グラフの追加
+  geom_bar(mapping = aes(colour = Species, #外枠の色
+                         fill = Species), #塗りつぶしの色
+           stat = "identity",
+           width = 0.6, #棒グラフの横幅を指定する
+           show.legend = FALSE) + #凡例を表示しない
+  #誤差範囲の追加
+  geom_errorbar(mapping = aes(ymin = ymin, ymax = ymax),#誤差範囲を指定する
+                width = 0.2, #キャップの横幅を指定する
+                linewidth = 0.3, #エラーバーの線の太さを指定する
+                show.legend = FALSE) + #凡例を表示しない
+  #ラベルの変更
+  labs(title = "Average Petal Length",
+       y = "Petal Length (cm)") + #y軸ラベルを変更する
+  #y軸の0座標を描画範囲の端に合わせる
+  scale_y_continuous(expand = c(0, 0, 0.05, 0))
+
+#プロット
+barplot_iris3
+
+```
 
 ## プロット基礎４（折れ線グラフ）
 
