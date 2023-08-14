@@ -1,0 +1,75 @@
+---
+title: "test"
+author: "written by jspar project"
+date: "`r paste('last update:', Sys.Date())`"
+tutorial: 
+  id: "researchwithr.ga/test"
+  version: 0.1
+lang: ja
+output: 
+  learnr::tutorial:
+    includes: 
+      in_header: ../header.html
+      before_body: ../gnavi.html
+    progressive: false
+    number_sections: false
+    language:
+      en:
+        text:
+          startover: リセットする
+        button:
+          runcode: コードを実行
+          continue: 続ける
+          copyclipboard: クリップボードにコピー
+          startover: リセットする
+          previoustopic: 前のトピック
+          nexttopic: 次のトピック
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(tidyverse)
+#library(magrittr)
+
+knitr::opts_chunk$set(error = TRUE)
+
+tutorial_options(exercise.timelimit = 10)
+
+## start-over-automatically-at-everyaccess
+options(tutorial.storage = list(
+  # save an arbitrary R object "data" to storage
+  save_object = function(tutorial_id, tutorial_version, user_id, object_id, data) {},
+  # retreive a single R object from storage
+  get_object = function(tutorial_id, tutorial_version, user_id, object_id) {NULL},
+  # retreive a list of all R objects stored
+  get_objects = function(tutorial_id, tutorial_version, user_id) {list()},
+  # remove all stored R objects
+  remove_all_objects = function(tutorial_id, tutorial_version, user_id) {}
+))
+
+#data_q <- read_csv("../r-basics/data/data_questionnaire.csv", show_col_types = F)
+data_p <- read_csv("../r-basics/data/data_phyis.csv", show_col_types = F)
+
+data_iris <- iris %>% 
+  as_tibble()
+
+#setwd("data")
+```
+
+## 準備
+
+**このセクションのゴール**
+
+1.  今回使うパッケージを読み込むことができる。
+2.  `data_p`をプロット用にロングデータに変換できる。
+3.  ggplot2のキャンバスを用意できる。
+
+### パッケージの読み込み
+
+`tidyverse`パッケージを読み込むと、今回使う`ggplot2`も併せて読み込まれます。
+
+```{r prep, exercise=TRUE}
+library(tidyverse)
+
+```
