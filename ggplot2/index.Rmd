@@ -277,8 +277,6 @@ barplot_iris
 
 最後に、棒グラフや誤差範囲の横幅を調整、縦軸の軸名や範囲の修正をしたのがこちらです。
 
-`scale_y_continuous()`は、y軸（連続値）の各種設定をするための関数です。
-
 ```{r barplot4, exercise=TRUE, exercise.setup = "barplot1"}
 barplot_iris3 <-
   #キャンバスの準備
@@ -296,10 +294,7 @@ barplot_iris3 <-
                 show.legend = FALSE) + #凡例を表示しない
   #ラベルの変更
   labs(title = "Average Petal Length",
-       y = "Petal Length (cm)") + #y軸ラベルを変更する
-  #y軸の0座標を描画範囲の端に合わせる
-  scale_y_continuous(expand = c(0, 0, 0.05, 0))
-
+       y = "Petal Length (cm)") #y軸ラベルを変更する
 #プロット
 barplot_iris3
 
