@@ -164,7 +164,7 @@ csv_data %>% str()
 
 **このセクションのゴール**
 
-1.  表をgroup, sex順に並べ替えることができる。
+1.  表をsex, age順(降順)に並べ替えることができる。
 
 2.  group列をfactor型に変更できる。
 
@@ -268,7 +268,22 @@ csv_data %>%
 ちなみに、`mutate()`関数で新しい変数を作る際などにも`.after`は指定できます。
 
 ```{r mutate4, exercise=TRUE, exercise.setup = "mutate2"}
-csv_data %>% 
+final_data <- csv_data %>% 
   mutate(over40 = age > 40, .after = age)
+
+final_data
+```
+
+## CSVの書き出し
+
+**このセクションのゴール**
+
+1.  over40列を追加したtibbleを、csvに書き出してExcelで確認する。
+
+### Excel用CSVの保存
+
+```{r save_csv, exercise = TRUE, exercise.setup = "mutate4"}
+
+write_excel_csv(final_data, file = "data/final_data.csv")
 
 ```
