@@ -78,9 +78,13 @@ library(tidyverse)
 
 ggplotでは、１行が１観測で１列が１変数という整然データ（ロングデータ）のデータを用意する必要があります。
 
+今回は、`iris`というRに内蔵されているサンプルデータを使ってみます。
+
 ```{r prep_data, exercise=TRUE}
 data_iris <- iris %>% 
-  as_tibble()
+  as_tibble() %>% 
+  mutate(., id = 1:nrow(.)) %>% 
+  relocate(id)
 
 data_iris #構造を確認しておく
 
@@ -134,7 +138,19 @@ data_p_long
 ```{r prep_canvas, exercise=TRUE, exercise.setup="conf_data"}
 canvas_iris <- ggplot(data = data_iris, mapping = aes(x = Petal.Width, y = Sepal.Length))
 
-canvas_p <- ggplot(data = data_p_long, mapping = aes(x = conditions, y = value))
+canvas_p <- ggplot(data = data_p_long, mapping = aes(x = conditions, y = values))
+
+```
+
+キャンバスだけで一度プロットしてみましょう。
+
+コンソールに`plot(キャンバスを入れた変数)`と入れてEnterか、ただ単に`変数名`を入力してEnterすると、現時点のキャンバスがプロットされます。
+
+```{r check_canvas, exercise=TRUE, exercise.setup = "prep_canvas"}
+
+plot(canvas_iris)
+
+canvas_p
 
 ```
 
@@ -169,7 +185,7 @@ scatter_i
 
 `ggplot2`では、様々な条件でグラフの見た目を変えることができます。まずは色分けをやってみましょう。
 
-キャンバスを作るときの`aes()`で、色分けに使う列を指定します。
+キャンバスを作るときの`aes(colour = 列名)`で、色分けに使う列を指定します。
 
 ```{r scatter_colour1, exercise = TRUE, exercise.setup = "scatter1"}
 
@@ -178,7 +194,9 @@ canvas_iris <- ggplot(data = data_iris,
                                     y = Sepal.Length, 
                                     color = Species)) # <- ここ！
 
-scatter_iris <- canvas_iris + geom_point(alpha = 0.5) #散布図を指定
+scatter_iris <- 
+  canvas_iris + 
+  geom_point() #散布図を指定
 
 scatter_iris
 
@@ -188,6 +206,18 @@ scatter_iris
 
 実はここで描画したプロットには、同じ点に複数のデータが存在している箇所があります。そこで、各点の透明度を50%に設定して、再度実行してみましょう。透明度は`geom_point(alpha = 0.5)`のように小数で指定します。
 
+```{r scatter_colour2, exercise = TRUE, exercise.setup = "scatter_colour1"}
+
+scatter_iris <- 
+  canvas_iris +
+  geom_point(alpha = 0.5)
+
+
+scatter_iris
+```
+
+色が濃くなっている部分がポイントが重なった部分だとわかります。
+
 ## プロット基礎2（ボックスプロット・バイオリンプロット）
 
 正規分布していないデータのプロットなどに便利なボックスプロットやバイオリンプロットも、`geom_boxplot()`や`geom_violin()`を使うと簡単に描画できます。
@@ -196,10 +226,13 @@ scatter_iris
 
 ```{r boxplot1, exercise=TRUE, exercise.setup="prep_canvas"}
 
-boxplot_iris <- ggplot(data = data_iris,
+boxplot_iris <- 
+  #キャンバスを作る
+  ggplot(data = data_iris,
                        mapping = aes(x = Species, 
                                      y = Petal.Length,
                                      colour = Species)) +
+  #ボックスプロットを追加する
   geom_boxplot()
 
 boxplot_iris
@@ -210,10 +243,13 @@ boxplot_iris
 
 ```{r boxplot2, exercise=TRUE, exercise.setup="prep_canvas"}
 
-boxplot_iris <- ggplot(data = data_iris,
+boxplot_iris <- 
+  #キャンバスづくり
+  ggplot(data = data_iris,
                        mapping = aes(x = Species, 
                                      y = Petal.Length,
                                      colour = Species)) +
+  #ボックスプロット
   geom_boxplot(aes(fill = Species), # Species毎に塗りつぶす
                show.legend = FALSE, #凡例を表示しない
                alpha = 0.5, #塗りつぶしの濃さを薄めに
@@ -229,62 +265,67 @@ boxplot_iris
 
 棒グラフはプロットに使う各数値（e.g., 平均、ばらつきの範囲）を計算して表にしておく必要があります。
 
-まずは`dplyr`パッケージの`group_by()`や`summarise()`を使って各数値を計算します。
+先ほど作成したdata_p\_longをconditionごとに集計してみましょう。
 
-ここでは、先のボックスプロットと同様に、SpeciesごとのPetal.Lengthを平均±SDで示してみます。
+まず、condition毎の平均±SDでを算出する例です。
 
-```{r barplot1, exercise=TRUE}
-data_iris_barplot <-
-  data_iris %>% 
-  group_by(Species) %>% #これ以降の処理をSpeciesごとに実行する
-  summarise(mean = mean(Petal.Length), #平均を計算
-            sd = sd(Petal.Length),#sdを計算
-            ymax = mean + sd, #上側の誤差範囲
-            ymin = mean - sd) #下側の誤差範囲
+```{r barplot1, exercise=TRUE, exercise.setup = "to_long"}
 
-data_iris_barplot
+data_p_barplot <-
+  data_p_long %>% 
+  group_by(conditions) %>% 
+  summarise(mean = mean(values),  #平均を計算
+            sd = sd(values),      #sdを計算
+            ymax = mean + sd,     #上側の誤差範囲
+            ymin = mean - sd)     #下側の誤差範囲
+
+#コンソールで確認
+data_p_bar
 ```
 
-Speciesごとのmean, sd, ymax, yminを計算できました。これを使ってプロットしていきます。
+Conditionごとのmean, sd, ymax, yminを計算できました。これを使ってプロットしていきます。
 
-ggplot()で作ったキャンバスにgeom_bar()で棒グラフを追加しました。
+#### 棒グラフ `geom_col()`の追加
+
+ggplot()で作ったキャンバスに`geom_col()`で棒グラフを追加しました。
 
 ```{r barplot2, exercise=TRUE, exercise.setup = "barplot1"}
-barplot_iris <-
-  ggplot(data = data_iris_barplot,
-         mapping = aes(x = Species, y = mean)) + 
-  geom_bar(mapping = aes(colour = Species, #外枠の色
-                         fill = Species), #塗りつぶしの色
-           stat = "identity")  #棒グラフをかく
+barplot_data_p <-
+  #キャンバスを作る
+  ggplot(data = data_p_barplot,
+         mapping = aes(x = conditions, y = mean)) + 
+  #棒グラフをキャンバスに追加する
+  geom_col(mapping = aes(colour = conditions, #外枠の色
+                         fill = conditions))  #塗りつぶしの色
  
-barplot_iris
+barplot_data_p
 
 ```
 
 続いて、誤差範囲を追加しましょう。後から追加した要素がプロットの最前面に追加されます。
 
 ```{r barplot3, exercise=TRUE, exercise.setup = "barplot1"}
-barplot_iris <- 
-  ggplot(data = data_iris_barplot,
-         mapping = aes(x = Species, y = mean)) + 
-  geom_bar(mapping = aes(colour = Species, #外枠の色
-                         fill = Species), #塗りつぶしの色
-           stat = "identity") + #棒グラフをかく
+barplot_data_p <-
+  #キャンバスを作る
+  ggplot(data = data_p_barplot,
+         mapping = aes(x = conditions, y = mean)) + 
+  #棒グラフをキャンバスに追加する
+  geom_col(mapping = aes(colour = conditions, #外枠の色
+                         fill = conditions)) +  #塗りつぶしの色
   geom_errorbar(mapping = aes(ymin = ymin, ymax = ymax)) #誤差範囲を指定する
 
-barplot_iris
+barplot_data_p
 ```
 
 最後に、棒グラフや誤差範囲の横幅を調整、縦軸の軸名や範囲の修正をしたのがこちらです。
 
 ```{r barplot4, exercise=TRUE, exercise.setup = "barplot1"}
-barplot_iris3 <-
+barplot_data_p <-
   #キャンバスの準備
-  ggplot(data = data_iris_barplot, mapping = aes(x = Species, y = mean)) +
+  ggplot(data = data_p_barplot, mapping = aes(x = conditions, y = mean)) +
   #棒グラフの追加
-  geom_bar(mapping = aes(colour = Species, #外枠の色
-                         fill = Species), #塗りつぶしの色
-           stat = "identity",
+  geom_col(mapping = aes(colour = conditions, #外枠の色
+                         fill = conditions), #塗りつぶしの色
            width = 0.6, #棒グラフの横幅を指定する
            show.legend = FALSE) + #凡例を表示しない
   #誤差範囲の追加
@@ -293,14 +334,129 @@ barplot_iris3 <-
                 linewidth = 0.3, #エラーバーの線の太さを指定する
                 show.legend = FALSE) + #凡例を表示しない
   #ラベルの変更
-  labs(title = "Average Petal Length",
-       y = "Petal Length (cm)") #y軸ラベルを変更する
+  labs(title = "Average and SD",
+       y = "value (a.u.)") #y軸ラベルを変更する
 #プロット
-barplot_iris3
-
+barplot_data_p
 ```
 
 ## プロット基礎４（折れ線グラフ）
+
+### ゴール書いてないね
+
+折れ線グラフもエラーバーを付けるときには先に値を計算しておいた方が便利です'。
+
+#### データの準備
+
+今回は、sexとconditions別のプロットに挑戦してみましょう。
+
+```{r lineplot1, exercise=TRUE, exercise.setup = "to_long"}
+
+data_p_lineplot <- 
+  data_p_long %>% 
+  group_by(sex, conditions) %>% #複数の条件でグルーピングできます
+  summarise(mean = mean(values), 
+            sd = sd(values),
+            ymin = mean - sd,
+            ymax = mean + sd,
+            .groups = "drop") #グルーピングを解除
+
+data_p_lineplot
+
+```
+
+`group_by()`に複数の条件を指定したので、表の行数が増えました。
+
+#### 折れ線グラフの描画
+
+では、さっそくキャンバスを用意して、`geom_line()`で折れ線グラフを追加しましょう。
+
+`ggplot()`でキャンバスを用意するときに、`aes()`でgroup = sexと設定すると、sex毎に線を分けることができます。ここでは、さらに線種も性別で変えるように設定しました。
+
+```{r lineplot2, exercise = TRUE, exercise.setup = "lineplot1"}
+lineplot_data_p <- 
+  ggplot(data_p_lineplot,
+         aes(x = conditions, 
+             y = mean, 
+             group = sex, 
+             linetype = sex)) +
+  geom_line()
+
+lineplot_data_p
+
+```
+
+続いて、誤差範囲もつけていきます。
+
+```{r lineplot3, exercise = TRUE, exercise.setup = "lineplot1"}
+lineplot_data_p <- 
+  ggplot(data_p_lineplot,
+         aes(x = conditions, 
+             y = mean, 
+             group = sex,
+             linetype = sex)) +
+  geom_line() +
+  geom_errorbar(aes(ymin = ymin, ymax = ymax),
+                width = 0.2)
+
+lineplot_data_p
+```
+
+#### 線グラフの重なりを調整する
+
+エクセルで線グラフを作ると、今できた図のようにすべての線が同じ位置にプロットされてしまい、誤差範囲が分かりにくいといったことが頻繁に生じます。そこで、線毎（今回なら性別毎）に少しだけX座標をずらすことで、より分かりやすい図を描くことができます。
+
+ggplotで描画位置をずらすには、`position = position_dodge(width)`という引数を各`geom_xxx()`に設定します。
+
+```{r lineplot4, exercise = TRUE, exercise.setup = "lineplot1"}
+
+dodge_width <- 0.2 #あとでまとめて変更できるようにずらす量を変数に保存する
+
+lineplot_data_p <- 
+  ggplot(data_p_lineplot,
+         aes(x = conditions, 
+             y = mean, 
+             group = sex,
+             linetype = sex)) +
+  geom_line(position = position_dodge(width = dodge_width)) + # ここ！
+  geom_errorbar(aes(ymin = ymin, ymax = ymax),
+                width = 0.2,
+                position = position_dodge(width = dodge_width)) # ここ！
+
+lineplot_data_p
+
+
+```
+
+平均値のポイントを追加し、線種ではなく色で性別を現した例がこちらです。
+
+また、後に追加した`geom_xxx()`は図上でより前面に配置されるため、折れ線グラフ(`geom_line()`)を最後に追加しています。
+
+```{r lineplot5, exercise = TRUE, exercise.setup = "lineplot1"}
+
+dodge_width <- 0.2 #あとでまとめて変更できるようにずらす量を変数に保存する
+
+lineplot_data_p <- 
+  #キャンバスの準備
+  ggplot(data_p_lineplot,
+         aes(x = conditions, 
+             y = mean, 
+             group = sex,
+             colour = sex)) +
+  #エラーバー
+  geom_errorbar(aes(ymin = ymin, ymax = ymax),
+                width = 0.2,
+                position = position_dodge(width = dodge_width)) +
+  #ポイントを追加
+  geom_point(position = position_dodge(width = dodge_width)) +
+  #折れ線グラフ
+  geom_line(position = position_dodge(width = dodge_width)) +
+  #ラベルを編集
+  labs(y = "value (a.u.)")
+
+lineplot_data_p
+
+```
 
 ## プロット調整
 
