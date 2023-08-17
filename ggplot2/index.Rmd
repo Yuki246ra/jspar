@@ -156,9 +156,66 @@ canvas_p
 
 ## プロットの保存
 
-## 
+**このセクションのゴール**
 
-プロット基礎１（散布図）
+1.  ggpot2プロットをtiffとして保存できる
+2.  保存するときにdpi, サイズを指定できる
+
+Rで作図した結果は、tiffなどのファイル形式で保存して、論文やパワポに使うことが多々あります。
+
+特に論文用の図を作るときはDPI(解像度)の指定があることも多く、設定に悩むこともあると思います。
+
+ここでは`ggsave()`関数を使って、ggplot2で作った図をコンピュータに保存する方法を見ていきます。
+
+```{r save_plot1, exercise = TRUE, exercise.setup = "prep_canvas"}
+
+ggsave(filename = "plot_p.tiff", #ファイル名
+       plot = canvas_p)  #保存したいプロットの変数名
+
+```
+
+filenameとplotさえ指定すれば、とりあえずファイルを保存することはできます。
+
+では、主題のサイズとDPI指定についてです。`ggsave()`の引数をさらに増やします。
+
+ここでは120mm四方で、600DPIの図を提出するように求められていたとしましょう。
+
+```{r save_plot2, exercise = TRUE, exercise.setup = "prep_canvas"}
+
+ggsave(filename = "plot_p_600dpi.pdf", #ファイル名
+       path = "data",            #保存先のパス（省略可）
+       plot = canvas_p,          #保存したいプロットの変数名
+       scale = 1,                #図の表示倍率（デフォルトは１）
+       width = 120,             #横幅
+       height = 120,            #縦幅
+       units = "mm",            #横幅と縦幅の単位
+       dpi = 600,               #解像度(dots per inch)
+       compression= "lzw")      #可逆圧縮でファイルサイズ削減
+
+
+```
+
+なお、ファイルの拡張子を変えることで様々なファイルを書き出せますが、うまくいくものもあればうまくいかないものも。。。
+
+-   .pdf
+
+-   .tiff
+
+-   .png
+
+-   .bmp
+
+-   .jpeg
+
+-   .eps
+
+-   .ps
+
+-   .svg
+
+-   .wmf (windows only)
+
+## プロット基礎１（散布図）
 
 **このセクションのゴール**
 
