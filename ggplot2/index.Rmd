@@ -365,11 +365,11 @@ violinplot_iris2 <-
                        mapping = aes(x = Species, 
                                      y = Petal.Length,
                                      colour = Species)) +
-  #バイオリンプロット
-  geom_violin(aes(fill = Species),     # Species毎に塗りつぶす
+  #ボックスプロット
+  geom_boxplot(aes(fill = Species),     # Species毎に塗りつぶす
                show.legend = FALSE,    #凡例を表示しない
                alpha = 0.5,            #塗りつぶしの濃さを薄めに
-               width = 0.9) +          #横幅を少し狭めに
+               width = 0.3) +          #横幅を少し狭めに
   #個別の点を描画
   geom_point(aes(colour = NULL),       #色を単色に戻す
              size = 0.3,               #点を小さくする
@@ -389,17 +389,17 @@ ggbeeswarmパッケージのgeom_beeswarm()を使うと、よりきれいに整�
 
 library(ggbeeswarm)
 
-violinplot_iris3 <- 
+boxplot_beeswarm <- 
   #キャンバスづくり
   ggplot(data = data_iris,
                        mapping = aes(x = Species, 
                                      y = Petal.Length,
                                      colour = Species)) +
-  #バイオリンプロット
-  geom_violin(aes(fill = Species),     # Species毎に塗りつぶす
+  #ボックスプロット
+  geom_boxplot(aes(fill = Species),     # Species毎に塗りつぶす
                show.legend = FALSE,    #凡例を表示しない
                alpha = 0.5,            #塗りつぶしの濃さを薄めに
-               width = 0.9) +
+               width = 0.3) +
   geom_beeswarm(aes(colour = NULL),
                 size= 0.3,
                 show.legend = FALSE)
@@ -436,7 +436,7 @@ data_p_barplot <-
             ymin = mean - sd)     #下側の誤差範囲
 
 #コンソールで確認
-data_p_bar
+#data_p_barplot
 ```
 
 Conditionごとのmean, sd, ymax, yminを計算できました。これを使ってプロットしていきます。
