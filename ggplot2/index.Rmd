@@ -154,6 +154,67 @@ canvas_p
 
 ```
 
+## プロットの保存
+
+**このセクションのゴール**
+
+1.  ggpot2プロットをtiffとして保存できる
+2.  保存するときにdpi, サイズを指定できる
+
+Rで作図した結果は、tiffなどのファイル形式で保存して、論文やパワポに使うことが多々あります。
+
+特に論文用の図を作るときはDPI(解像度)の指定があることも多く、設定に悩むこともあると思います。
+
+ここでは`ggsave()`関数を使って、ggplot2で作った図をコンピュータに保存する方法を見ていきます。
+
+```{r save_plot1, exercise = TRUE, exercise.setup = "prep_canvas"}
+
+ggsave(filename = "plot_p.tiff", #ファイル名
+       plot = canvas_p)  #保存したいプロットの変数名
+
+```
+
+filenameとplotさえ指定すれば、とりあえずファイルを保存することはできます。
+
+では、主題のサイズとDPI指定についてです。`ggsave()`の引数をさらに増やします。
+
+ここでは120mm四方で、600DPIの図を提出するように求められていたとしましょう。
+
+```{r save_plot2, exercise = TRUE, exercise.setup = "prep_canvas"}
+
+ggsave(filename = "plot_p_600dpi.pdf", #ファイル名
+       path = "data",            #保存先のパス（省略可）
+       plot = canvas_p,          #保存したいプロットの変数名
+       scale = 1,                #図の表示倍率（デフォルトは１）
+       width = 120,             #横幅
+       height = 120,            #縦幅
+       units = "mm",            #横幅と縦幅の単位
+       dpi = 600,               #解像度(dots per inch)
+       compression= "lzw")      #可逆圧縮でファイルサイズ削減
+
+
+```
+
+なお、ファイルの拡張子を変えることで様々なファイルを書き出せますが、うまくいくものもあればうまくいかないものも。。。
+
+-   .pdf
+
+-   .tiff
+
+-   .png
+
+-   .bmp
+
+-   .jpeg
+
+-   .eps
+
+-   .ps
+
+-   .svg
+
+-   .wmf (windows only)
+
 ## プロット基礎１（散布図）
 
 **このセクションのゴール**
@@ -220,7 +281,15 @@ scatter_iris
 
 ## プロット基礎2（ボックスプロット・バイオリンプロット）
 
+**このセクションのゴール**
+
+1.  ggpot2を使って、ボックスプロットを描くことができる
+2.  ggplot2を使って、バイオリンプロットを描くことができる
+3.  ボックスプロットと散布図を重ね合わせて描画できる。
+
 正規分布していないデータのプロットなどに便利なボックスプロットやバイオリンプロットも、`geom_boxplot()`や`geom_violin()`を使うと簡単に描画できます。
+
+#### ボックスプロット
 
 ここでは、SpeciesごとにPetal.Lengthを比較してみましょう。
 
@@ -259,7 +328,94 @@ boxplot_iris <-
 boxplot_iris
 ```
 
+#### バイオリンプロット
+
+`geom_boxplot()`の代わりに、`geom_violin()`を使えばOK。
+
+```{r violin_plot1, exercise=TRUE, exercise.setup="prep_canvas"}
+
+violinplot_iris <- 
+  #キャンバスづくり
+  ggplot(data = data_iris,
+                       mapping = aes(x = Species, 
+                                     y = Petal.Length,
+                                     colour = Species)) +
+  #バイオリンプロット
+  geom_violin(aes(fill = Species), # Species毎に塗りつぶす
+               show.legend = FALSE, #凡例を表示しない
+               alpha = 0.5, #塗りつぶしの濃さを薄めに
+               width = 0.8) #横幅を少し狭めに
+               
+
+violinplot_iris
+
+```
+
+#### 各ポイントも重ね書きする
+
+もともとのデータのばらつきも示したいときには、`geom_point()`で個別データをプロットすると有効です。
+
+一列に並ぶと重なり合って結局各点が見えないので、`position = position_jitter()`でx座標にランダムなばらつきを加えています。
+
+```{r violin_plot2, exercise=TRUE, exercise.setup="prep_canvas"}
+
+violinplot_iris2 <- 
+  #キャンバスづくり
+  ggplot(data = data_iris,
+                       mapping = aes(x = Species, 
+                                     y = Petal.Length,
+                                     colour = Species)) +
+  #バイオリンプロット
+  geom_violin(aes(fill = Species),     # Species毎に塗りつぶす
+               show.legend = FALSE,    #凡例を表示しない
+               alpha = 0.5,            #塗りつぶしの濃さを薄めに
+               width = 0.9) +          #横幅を少し狭めに
+  #個別の点を描画
+  geom_point(aes(colour = NULL),       #色を単色に戻す
+             size = 0.3,               #点を小さくする
+             position = position_jitter(width = 0.2, height = 0), #x座標だけばらつかせる
+             show.legend = FALSE)
+               
+
+violinplot_iris2
+
+```
+
+#### ちなみに
+
+ggbeeswarmパッケージのgeom_beeswarm()を使うと、よりきれいに整列された各点プロットができます。
+
+```{r beeswarm, eval=FALSE}
+
+library(ggbeeswarm)
+
+violinplot_iris3 <- 
+  #キャンバスづくり
+  ggplot(data = data_iris,
+                       mapping = aes(x = Species, 
+                                     y = Petal.Length,
+                                     colour = Species)) +
+  #バイオリンプロット
+  geom_violin(aes(fill = Species),     # Species毎に塗りつぶす
+               show.legend = FALSE,    #凡例を表示しない
+               alpha = 0.5,            #塗りつぶしの濃さを薄めに
+               width = 0.9) +
+  geom_beeswarm(aes(colour = NULL),
+                size= 0.3,
+                show.legend = FALSE)
+
+
+```
+
+![violinplot_iris3](images/beeswarm.png){width="624"}
+
 ## プロット基礎２（棒グラフ）
+
+**このセクションのゴール**
+
+1.  dplyrパッケージを使って、プロット用の表を計算できる
+2.  作成した表を基に棒グラフを描ける
+3.  誤差範囲も忘れずに
 
 #### プロットする値の計算
 
@@ -342,7 +498,10 @@ barplot_data_p
 
 ## プロット基礎４（折れ線グラフ）
 
-### ゴール書いてないね
+**このセクションのゴール**
+
+1.  ggpot2を使って、折れ線グラフを描くことができる
+2.  折れ線グラフのx座標を調整して、見やすいグラフを作ることができる。
 
 折れ線グラフもエラーバーを付けるときには先に値を計算しておいた方が便利です'。
 
@@ -460,14 +619,187 @@ lineplot_data_p
 
 ## プロット調整
 
-## プロット結合
+ここからはおまけです。
 
-## プロットの保存
+### テーマの調整
 
-## 
+デフォルトのテーマ（見た目）は論文向きではないこともあります。そこで、`theme_bw()`や`theme_classic()`を使うと、論文向きのデザインに手軽に変えることができます。
 
-```{r ggplot2_1, exercise=TRUE}
+使い方は`geom_XXX()`を使うときと同様に、`+`でつなげるだけです。
 
-ggplot(data_iris)
+#### デフォルトテーマ
+
+```{r theme_gray, exercise = TRUE, exercise.setup = "lineplot5"}
+
+lineplot_data_p + theme_gray()
+
+```
+
+#### theme_bw(白黒)
+
+```{r theme_bw, exercise = TRUE, exercise.setup = "lineplot5"}
+
+lineplot_data_p + theme_bw()
+
+```
+
+#### theme_bw(クラシック)
+
+```{r theme_classic, exercise = TRUE, exercise.setup = "lineplot5"}
+
+lineplot_data_p + theme_classic()
+
+```
+
+### 凡例の位置や方向
+
+凡例の位置は`theme(legend.position = )`で変更できます。
+
+#### 上
+
+```{r legend_top, exercise = TRUE, exercise.setup = "lineplot5"}
+
+lineplot_data_p + theme(legend.position = "top")
+
+```
+
+#### 下
+
+```{r legend_bottom, exercise = TRUE, exercise.setup = "lineplot5"}
+
+lineplot_data_p + theme(legend.position = "bottom")
+
+```
+
+#### なし
+
+```{r theme_none, exercise = TRUE, exercise.setup = "lineplot5"}
+
+lineplot_data_p + theme(legend.position = "none")
+
+```
+
+#### 数値指定
+
+プロットエリア内に配置したい場合は、xとyの位置をベクトルで指定します。
+
+また、`legend.direction =`を使って、凡例の方向（垂直・水平）が指定できます。
+
+```{r legend_manual, exercise = TRUE, exercise.setup = "lineplot5"}
+
+lineplot_data_p + theme(legend.position = c(0.15, 0.95),
+                        legend.direction = "horizontal")
+
+```
+
+#### 軸の調整
+
+図を描いていると軸の範囲やラベル、目盛りの間隔を変えたいなどいろいろな願望が生まれます。
+
+ここでは　いくつかの例を挙げてみます。
+
+`scale_y_continuous()`はy軸が連続データの時, `scale_x_continuous()`はx軸が連続値の時に使用する関数です。
+
+#### 連続値の軸範囲
+
+他のグラフと範囲を揃えたいや、後で有意差のカッコ入れたいからプロットエリアの上の方を空けたいなど、軸の描画範囲を指定したい場面は結構あります。 軸の描画範囲は`limits = c(最小値, 最大値)`で指定します。
+
+```{r scale_cont_limits, exercise = TRUE, exercise.setup = "lineplot5"}
+
+lineplot_data_p + 
+  scale_y_continuous(limits = c(0, 1.25)) + 
+  theme_classic()
+
+```
+
+y軸の描画範囲が0 \~ 1.25に拡幅されました。
+
+#### 連続値の目盛間隔
+
+軸の目盛りは`breaks = 目盛りを入れたい場所の数値ベクトル`で指定します。
+
+```{r scale_cont_breaks, exercise = TRUE, exercise.setup = "lineplot5"}
+
+lineplot_data_p + 
+  scale_y_continuous(limits = c(0, 1.25),
+                     breaks = c(0, 0.1, 0.5, 0.9, 1)) + #ここ！
+  theme_classic()
+
+```
+
+手動で設定した5か所に目盛りが入りました
+
+普通は間隔さえ指定できればいい例が多いと思いますので、`seq()`関数を使います。
+
+軸の目盛りは`breaks = 目盛りを入れたい場所の数値ベクトル`で指定します。
+
+```{r scale_cont_breaks2, exercise = TRUE, exercise.setup = "lineplot5"}
+
+lineplot_data_p + 
+  scale_y_continuous(limits = c(0, 1.25),
+                     breaks = seq(from = -100, #y軸の最小値より小さい値
+                                  to = 100,    #y軸の最大値より大きい値
+                                  by = 0.2)) + #目盛り間隔
+  theme_classic()
+
+```
+
+`seq()`の`by =`に指定する値が間隔になるので特に重要ですが、`from =`に指定する値も目盛り位置を左右するので注意が必要です。
+
+いろいろ数値を変えて試してみましょう
+
+### 水平線・垂直線の追加
+
+ある地点からの変化量を示したグラフなどでは、水平線を追加すると見やすいグラフになったりします。
+
+水平線は`geom_hline()`で入れることができます。切片と傾きがあれば斜めの線も`geom_abline()`で追加できます。
+
+#### 水平線
+
+```{r hline, exercise = TRUE, exercise.setup = "lineplot5"}
+
+lineplot_data_p + 
+  geom_hline(yintercept = 0.5,            #y = 0.5の位置に水平線を入れる
+             linewidth = 0.2) +           #少し線を細くする
+  theme_classic() 
+
+```
+
+実際の作図では、水平線や垂直線は一番裏側にいてほしいので、キャンバスを作ってまず先に`geom_hline()`を足し、その後に`geom_line()`などを配置します。
+
+linetypeも指定できます。
+
+```{r hline2, exercise = TRUE, exercise.setup = "lineplot1"}
+
+ggplot(data_p_lineplot, 
+       aes(x = conditions, y = mean, colour = sex, group = sex)) +
+  #先にgeom_hline
+  geom_hline(yintercept = 0.5, linewidth = 0.5, linetype = "dotted") +
+  #次にerrorbar
+  geom_errorbar(aes(ymin = ymin, ymax = ymax), position = position_dodge(0.2),  width = 0.2) +
+  #やっとメインの折れ線
+  geom_line(position = position_dodge(0.2)) +
+  #ポイントを一番上に
+  geom_point(position = position_dodge(0.2)) +
+  theme_classic()
+
+```
+
+#### 垂直線
+
+垂直線は`geom_vline()`です。
+
+今回のグラフはx軸が離散値ですが、各項目の間隔は1になっているので好きな位置を指定できます。
+
+```{r vline, exercise = TRUE, exercise.setup = "lineplot5"}
+
+linewidth <- 0.5      #線の太さ
+linetype  <- "dashed" #線の種類
+alpha     <- 0.5      #線の透明度
+
+lineplot_data_p + 
+  geom_vline(xintercept = 1.5,  linewidth = linewidth, linetype = linetype, alpha = alpha) +
+  geom_vline(xintercept = 2.75, linewidth = linewidth, linetype = linetype, alpha = alpha) +
+  theme_classic() 
 
 ```
